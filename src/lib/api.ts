@@ -1,4 +1,4 @@
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "https://counselworks-api-production.up.railway.app";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://counselworks-api-production.up.railway.app";
 
 class ApiClient {
   private token: string | null = null;
@@ -7,7 +7,7 @@ class ApiClient {
     this.token = token;
   }
 
-  private async request<T>(path: string, options: RequestInit = {}): Promise<T> {
+  private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
       ...(options.headers as Record<string, string>),
@@ -17,14 +17,13 @@ class ApiClient {
       headers["Authorization"] = `Bearer ${this.token}`;
     }
 
-    const res = await fetch(`${API_BASE}${path}`, {
+    const res = await fetch(`${API_URL}${endpoint}`, {
       ...options,
       headers,
     });
 
     if (!res.ok) {
-      const body = await res.json().catch(() => ({}));
-      throw new Error(body.message || `API error: ${res.status}`);
+      throw new Error(`API error: ${res.status}`);
     }
 
     return res.json();
@@ -32,67 +31,35 @@ class ApiClient {
 
   // Auth
   async login(email: string, password: string) {
-    return this.request<{ token: string; user: import("@/types").User }>("/api/auth/login", {
+    return this.request<{ token: string; user: unknown }>("/auth/login", {
       method: "POST",
       body: JSON.stringify({ email, password }),
     });
   }
 
-  async getMe() {
-    return this.request<{ user: import("@/types").User }>("/api/auth/me");
-  }
-
   // Cases
   async getCases() {
-    return this.request<{ cases: import("@/types").Case[] }>("/api/cases");
+    return this.request<unknown[]>("/cases");
   }
 
   async getCase(id: string) {
-    return this.request<{ case: import("@/types").Case }>(`/api/cases/${id}`);
-  }
-
-  async createCase(data: Partial<import("@/types").Case>) {
-    return this.request<{ case: import("@/types").Case }>("/api/cases", {
-      method: "POST",
-      body: JSON.stringify(data),
-    });
-  }
-
-  async updateCase(id: string, data: Partial<import("@/types").Case>) {
-    return this.request<{ case: import("@/types").Case }>(`/api/cases/${id}`, {
-      method: "PATCH",
-      body: JSON.stringify(data),
-    });
+    return this.request<unknown>(`/cases/${id}`);
   }
 
   // Requests
   async getRequests() {
-    return this.request<{ requests: import("@/types").Request[] }>("/api/requests");
+    return this.request<unknown[]>("/requests");
   }
 
-  async createRequest(data: Partial<import("@/types").Request>) {
-    return this.request<{ request: import("@/types").Request }>("/api/requests", {
-      method: "POST",
-      body: JSON.stringify(data),
-    });
-  }
-
-  async updateRequest(id: string, data: Partial<import("@/types").Request>) {
-    return this.request<{ request: import("@/types").Request }>(`/api/requests/${id}`, {
-      method: "PATCH",
-      body: JSON.stringify(data),
-    });
-  }
-
-  // Documents / Files
+  // Documents
   async getDocuments() {
-    return this.request<{ files: import("@/types").Document[] }>("/api/files");
+    return this.request<unknown[]>("/documents");
   }
 
   // Notifications
   async getNotifications() {
-    return this.request<{ notifications: import("@/types").Notification[] }>("/api/notifications");
+    return this.request<unknown[]>("/notifications");
   }
 }
 
-export const api = new ApiClient();
+export const apiClient = new ApiClient();

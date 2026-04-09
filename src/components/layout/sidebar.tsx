@@ -3,96 +3,89 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/context/auth-context";
+import {
+  LayoutDashboard,
+  Briefcase,
+  FileText,
+  ClipboardList,
+  LogOut,
+} from "lucide-react";
 
-const navItems = [
-  { label: "Dashboard", href: "/dashboard", icon: "grid" },
-  { label: "Cases", href: "/cases", icon: "briefcase" },
-  { label: "Requests", href: "/requests", icon: "clipboard" },
-  { label: "Documents", href: "/documents", icon: "file" },
+const navigation = [
+  { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { name: "Cases", href: "/cases", icon: Briefcase },
+  { name: "Requests", href: "/requests", icon: ClipboardList },
+  { name: "Documents", href: "/documents", icon: FileText },
 ];
-
-const iconPaths: Record<string, string> = {
-  grid: "M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z",
-  briefcase:
-    "M20 7H4a1 1 0 00-1 1v11a1 1 0 001 1h16a1 1 0 001-1V8a1 1 0 00-1-1zM16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2",
-  clipboard:
-    "M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2M9 2h6a1 1 0 011 1v1a1 1 0 01-1 1H9a1 1 0 01-1-1V3a1 1 0 011-1z",
-  file: "M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8zM14 2v6h6",
-};
 
 export default function Sidebar() {
   const pathname = usePathname();
-  const { user, logout, isAttorney } = useAuth();
+  const { user, logout } = useAuth();
 
   return (
-    <aside className="flex h-screen w-64 flex-col border-r border-gray-200 bg-white">
-      {/* Logo */}
-      <div className="flex h-16 items-center gap-2 border-b border-gray-200 px-6">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-700 text-white text-sm font-bold">
-          CW
-        </div>
-        <span className="text-lg font-semibold text-gray-900">CounselWorks</span>
+    <aside className="fixed left-0 top-0 h-full w-60 bg-navy-800 border-r border-navy-500 flex flex-col z-50">
+      {/* Brand */}
+      <div className="px-5 py-6 border-b border-navy-500">
+        <Link href="/dashboard" className="flex items-center gap-3">
+          <div className="w-9 h-9 bg-gold/10 border border-gold/30 flex items-center justify-center flex-shrink-0">
+            <span className="text-gold font-bold text-xs tracking-tight">CW</span>
+          </div>
+          <span className="text-white font-semibold text-[15px] tracking-tight">
+            Counsel<span className="text-gold">Works</span>
+          </span>
+        </Link>
       </div>
 
-      {/* Nav */}
-      <nav className="flex-1 space-y-1 px-3 py-4">
-        {navItems.map((item) => {
-          const active = pathname.startsWith(item.href);
+      {/* Navigation */}
+      <nav className="flex-1 px-3 py-4 space-y-0.5">
+        {navigation.map((item) => {
+          const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
           return (
             <Link
-              key={item.href}
+              key={item.name}
               href={item.href}
-              className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
-                active
-                  ? "bg-brand-50 text-brand-700"
-                  : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+              className={`flex items-center gap-3 px-3 py-2.5 text-sm font-medium transition-all group ${
+                isActive
+                  ? "bg-gold/10 text-gold border-l-2 border-gold -ml-[1px]"
+                  : "text-slate-400 hover:text-white hover:bg-navy-700/50"
               }`}
             >
-              <svg
-                className="h-5 w-5 flex-shrink-0"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={1.5}
-                viewBox="0 0 24 24"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" d={iconPaths[item.icon]} />
-              </svg>
-              {item.label}
+              <item.icon
+                size={18}
+                strokeWidth={1.8}
+                className={isActive ? "text-gold" : "text-slate-500 group-hover:text-slate-300"}
+              />
+              {item.name}
             </Link>
           );
         })}
       </nav>
 
-      {/* User */}
-      <div className="border-t border-gray-200 p-4">
-        <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-100 text-brand-700 text-sm font-semibold">
-            {user?.name
-              .split(" ")
-              .map((n) => n[0])
-              .join("")}
+      {/* User info */}
+      {user && (
+        <div className="px-4 py-4 border-t border-navy-500">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-navy-600 border border-navy-400 flex items-center justify-center flex-shrink-0">
+              <span className="text-xs font-semibold text-slate-300">
+                {user.firstName[0]}{user.lastName[0]}
+              </span>
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-white truncate">
+                {user.firstName} {user.lastName}
+              </p>
+              <p className="text-xs text-slate-500 capitalize">{user.role}</p>
+            </div>
+            <button
+              onClick={logout}
+              className="p-1.5 text-slate-500 hover:text-red-400 transition-colors"
+              title="Sign out"
+            >
+              <LogOut size={16} strokeWidth={1.8} />
+            </button>
           </div>
-          <div className="flex-1 min-w-0">
-            <p className="truncate text-sm font-medium text-gray-900">{user?.name}</p>
-            <p className="truncate text-xs text-gray-500">
-              {isAttorney ? "Attorney" : "Staff"}
-            </p>
-          </div>
-          <button
-            onClick={logout}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
-            title="Sign out"
-          >
-            <svg className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3-3h-9m9 0l-3-3m3 3l-3 3"
-              />
-            </svg>
-          </button>
         </div>
-      </div>
+      )}
     </aside>
   );
 }

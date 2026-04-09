@@ -1,130 +1,124 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AppShell from "@/components/layout/app-shell";
 import { mockDocuments } from "@/lib/mock-data";
-import { StatusBadge } from "@/components/ui/status-badge";
+import { Document } from "@/types";
+import { Search, Upload, FileText, Download } from "lucide-react";
 
-const categoryFilters = ["all", "pleading", "discovery", "correspondence", "evidence", "internal", "other"] as const;
-
-function formatSize(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-}
+const categories = ["All", "Pleading", "Discovery", "Medical", "Correspondence", "Court Order", "Evidence"];
 
 export default function DocumentsPage() {
-  const [filter, setFilter] = useState<string>("all");
+  const [documents, setDocuments] = useState<Document[]>([]);
   const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState("All");
 
-  const filtered = mockDocuments.filter((d) => {
-    if (filter !== "all" && d.category !== filter) return false;
-    if (search) {
-      const q = search.toLowerCase();
-      return d.name.toLowerCase().includes(q) || (d.caseTitle || "").toLowerCase().includes(q);
-    }
-    return true;
+  useEffect(() => {
+    setDocuments(mockDocuments);
+  }, []);
+
+  const filtered = documents.filter((d) => {
+    const matchesSearch =
+      d.name.toLowerCase().includes(search.toLowerCase()) ||
+      d.category.toLowerCase().includes(search.toLowerCase());
+    const matchesFilter = filter === "All" || d.category.toLowerCase() === filter.toLowerCase();
+    return matchesSearch && matchesFilter;
   });
+
+  const categoryStyle = (cat: string): string => {
+    const styles: Record<string, string> = {
+      pleading: "text-blue-400",
+      discovery: "text-amber-400",
+      medical: "text-emerald-400",
+      correspondence: "text-purple-400",
+      "court order": "text-red-400",
+      evidence: "text-teal-400",
+    };
+    return styles[cat.toLowerCase()] || "text-slate-400";
+  };
 
   return (
     <AppShell>
-      <div className="mb-6 flex items-center justify-between">
+      <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Documents</h1>
-          <p className="mt-1 text-sm text-gray-500">{mockDocuments.length} total documents</p>
+          <h1 className="text-2xl font-bold text-white tracking-tight">Documents</h1>
+          <p className="text-sm text-slate-400 mt-1">{filtered.length} documents</p>
         </div>
-        <button className="rounded-lg bg-brand-700 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-brand-800 transition-colors">
-          + Upload
+        <button className="flex items-center gap-2 px-4 py-2.5 bg-gold hover:bg-gold-400 text-navy-900 text-sm font-semibold transition-colors">
+          <Upload size={16} strokeWidth={2} />
+          Upload
         </button>
       </div>
 
-      {/* Search & Filters */}
-      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center">
-        <input
-          type="text"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search documents..."
-          className="w-full sm:w-80 rounded-lg border border-gray-300 px-4 py-2 text-sm shadow-sm placeholder:text-gray-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 focus:outline-none"
-        />
-        <div className="flex flex-wrap gap-1.5">
-          {categoryFilters.map((f) => (
+      {/* Search + Filters */}
+      <div className="flex flex-wrap items-center gap-3 mb-6">
+        <div className="relative flex-1 max-w-sm">
+          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+          <input
+            type="text"
+            placeholder="Search documents..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full pl-10 pr-4 py-2.5 bg-navy-800 border border-navy-500 text-white text-sm placeholder-slate-500 focus:outline-none focus:border-gold/50 transition-colors"
+          />
+        </div>
+        <div className="flex gap-1">
+          {categories.map((c) => (
             <button
-              key={f}
-              onClick={() => setFilter(f)}
-              className={`rounded-full px-3 py-1 text-xs font-medium transition-colors capitalize ${
-                filter === f
-                  ? "bg-brand-700 text-white"
-                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+              key={c}
+              onClick={() => setFilter(c)}
+              className={`px-3 py-1.5 text-xs font-medium transition-colors ${
+                filter === c
+                  ? "bg-gold/15 text-gold border border-gold/30"
+                  : "text-slate-400 hover:text-white border border-transparent hover:border-navy-400"
               }`}
             >
-              {f}
+              {c}
             </button>
           ))}
         </div>
       </div>
 
-      {/* Documents Table */}
-      <div className="rounded-xl border border-gray-200 bg-white overflow-hidden">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
-                Name
-              </th>
-              <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
-                Case
-              </th>
-              <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
-                Category
-              </th>
-              <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
-                Size
-              </th>
-              <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
-                Uploaded By
-              </th>
-              <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
-                Date
-              </th>
+      {/* Table */}
+      <div className="bg-navy-800 border border-navy-500 overflow-hidden">
+        <table className="w-full">
+          <thead>
+            <tr className="border-b border-navy-500">
+              <th className="text-left px-5 py-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">Document</th>
+              <th className="text-left px-5 py-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">Category</th>
+              <th className="text-left px-5 py-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">Case</th>
+              <th className="text-left px-5 py-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">Uploaded By</th>
+              <th className="text-left px-5 py-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">Date</th>
+              <th className="text-right px-5 py-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
-            {filtered.map((d) => (
-              <tr key={d.id} className="hover:bg-gray-50 transition-colors cursor-pointer">
+          <tbody className="divide-y divide-navy-600/50">
+            {filtered.map((doc) => (
+              <tr key={doc.id} className="hover:bg-navy-700/30 transition-colors">
                 <td className="px-5 py-4">
                   <div className="flex items-center gap-3">
-                    <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-gray-100">
-                      <svg className="h-5 w-5 text-gray-500" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
-                      </svg>
-                    </div>
-                    <p className="truncate text-sm font-medium text-gray-900 max-w-xs">{d.name}</p>
+                    <FileText size={16} className="text-slate-500 flex-shrink-0" />
+                    <span className="text-sm font-medium text-white">{doc.name}</span>
                   </div>
                 </td>
-                <td className="px-5 py-4 text-sm text-gray-700">{d.caseTitle || "\u2014"}</td>
                 <td className="px-5 py-4">
-                  <StatusBadge status={d.category} type="case" />
+                  <span className={`text-sm font-medium ${categoryStyle(doc.category)}`}>{doc.category}</span>
                 </td>
-                <td className="px-5 py-4 text-sm text-gray-700">{formatSize(d.size)}</td>
-                <td className="px-5 py-4 text-sm text-gray-700">{d.uploadedByName}</td>
-                <td className="px-5 py-4 text-sm text-gray-700">
-                  {new Date(d.createdAt).toLocaleDateString("en-US", {
-                    month: "short",
-                    day: "numeric",
-                  })}
+                <td className="px-5 py-4 text-sm text-slate-400">{doc.caseName || "—"}</td>
+                <td className="px-5 py-4 text-sm text-slate-300">{doc.uploadedBy}</td>
+                <td className="px-5 py-4 text-sm text-slate-400">{new Date(doc.uploadedAt).toLocaleDateString()}</td>
+                <td className="px-5 py-4 text-right">
+                  <button className="p-1.5 text-slate-500 hover:text-gold transition-colors" title="Download">
+                    <Download size={14} />
+                  </button>
                 </td>
               </tr>
             ))}
-            {filtered.length === 0 && (
-              <tr>
-                <td colSpan={6} className="px-5 py-12 text-center text-sm text-gray-500">
-                  No documents found.
-                </td>
-              </tr>
-            )}
           </tbody>
         </table>
+        {filtered.length === 0 && (
+          <div className="px-5 py-12 text-center text-slate-500 text-sm">No documents found.</div>
+        )}
       </div>
     </AppShell>
   );

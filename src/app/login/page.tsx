@@ -1,128 +1,140 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/auth-context";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
   const router = useRouter();
 
-  async function handleSubmit(e: React.FormEvent) {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    setLoading(true);
-
+    setIsLoading(true);
     try {
       await login(email, password);
-      router.replace("/dashboard");
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Login failed");
+      router.push("/dashboard");
+    } catch {
+      setError("Invalid credentials. Try a demo account below.");
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
-    <div className="flex min-h-screen">
-      {/* Left panel */}
-      <div className="hidden lg:flex lg:w-1/2 bg-brand-700 flex-col justify-between p-12 text-white">
-        <div>
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/20 text-lg font-bold">
-              CW
+    <div className="min-h-screen flex bg-navy-900">
+      {/* Left brand panel */}
+      <div className="hidden lg:flex lg:w-[55%] flex-col justify-between p-12 relative overflow-hidden">
+        {/* Subtle gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-br from-navy-800 via-navy-900 to-navy-950" />
+        {/* Gold accent line at top */}
+        <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-gold/0 via-gold to-gold/0" />
+
+        <div className="relative z-10">
+          <div className="flex items-center gap-3 mb-20">
+            <div className="w-10 h-10 bg-gold/10 border border-gold/30 flex items-center justify-center">
+              <span className="text-gold font-semibold text-sm tracking-tight">CW</span>
             </div>
-            <span className="text-2xl font-semibold">CounselWorks</span>
+            <span className="text-white font-semibold text-lg tracking-tight">
+              Counsel<span className="text-gold">Works</span>
+            </span>
           </div>
-        </div>
-        <div>
-          <h1 className="text-4xl font-bold leading-tight">
-            Legal operations,
-            <br />
-            simplified.
+
+          <h1 className="text-5xl font-bold text-white leading-tight mb-6 tracking-tight">
+            Legal operations,<br />
+            <span className="text-gold">simplified.</span>
           </h1>
-          <p className="mt-4 text-lg text-brand-200 max-w-md">
+          <p className="text-slate-400 text-lg leading-relaxed max-w-md">
             No lead missed. Instant case visibility. Blockers surfaced. Attorney-controlled approvals.
           </p>
         </div>
-        <p className="text-sm text-brand-300">&copy; 2026 CounselWorks. All rights reserved.</p>
+
+        <div className="relative z-10">
+          {/* Decorative grid pattern */}
+          <div className="flex gap-2 mb-8">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="w-1.5 h-1.5 bg-gold/20" />
+            ))}
+          </div>
+          <p className="text-slate-500 text-sm">
+            &copy; {new Date().getFullYear()} CounselWorks. All rights reserved.
+          </p>
+        </div>
       </div>
 
-      {/* Right panel */}
-      <div className="flex w-full lg:w-1/2 items-center justify-center p-8 bg-gray-50">
-        <div className="w-full max-w-md">
-          <div className="lg:hidden flex items-center gap-3 mb-10">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-700 text-white text-lg font-bold">
-              CW
+      {/* Right login panel */}
+      <div className="flex-1 flex items-center justify-center p-8 lg:p-12">
+        <div className="w-full max-w-[420px]">
+          {/* Mobile logo */}
+          <div className="lg:hidden flex items-center gap-3 mb-12">
+            <div className="w-10 h-10 bg-gold/10 border border-gold/30 flex items-center justify-center">
+              <span className="text-gold font-semibold text-sm">CW</span>
             </div>
-            <span className="text-2xl font-semibold text-gray-900">CounselWorks</span>
+            <span className="text-white font-semibold text-lg">
+              Counsel<span className="text-gold">Works</span>
+            </span>
           </div>
 
-          <h2 className="text-2xl font-bold text-gray-900">Sign in to your account</h2>
-          <p className="mt-2 text-sm text-gray-500">
-            Enter your credentials to access CounselWorks OS
-          </p>
+          <h2 className="text-2xl font-bold text-white mb-2 tracking-tight">Sign in to your account</h2>
+          <p className="text-slate-400 text-sm mb-8">Enter your credentials to access CounselWorks OS</p>
 
           {error && (
-            <div className="mt-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700 ring-1 ring-inset ring-red-600/20">
+            <div className="mb-6 p-3 bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
               {error}
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="mt-8 space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                Email address
-              </label>
+              <label className="block text-sm font-medium text-slate-300 mb-2">Email address</label>
               <input
-                id="email"
                 type="email"
-                required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-2.5 text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 focus:outline-none"
                 placeholder="you@yourfirm.com"
+                required
+                className="w-full px-4 py-3 bg-navy-800 border border-navy-500 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold/30 transition-colors"
               />
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                Password
-              </label>
+              <label className="block text-sm font-medium text-slate-300 mb-2">Password</label>
               <input
-                id="password"
                 type="password"
-                required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="mt-1.5 block w-full rounded-lg border border-gray-300 px-4 py-2.5 text-gray-900 shadow-sm placeholder:text-gray-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 focus:outline-none"
                 placeholder="Enter your password"
+                required
+                className="w-full px-4 py-3 bg-navy-800 border border-navy-500 text-white placeholder-slate-500 text-sm focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold/30 transition-colors"
               />
             </div>
 
             <button
               type="submit"
-              disabled={loading}
-              className="w-full rounded-lg bg-brand-700 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-brand-800 focus:outline-none focus:ring-2 focus:ring-brand-500/20 disabled:opacity-50 transition-colors"
+              disabled={isLoading}
+              className="w-full py-3 bg-gold hover:bg-gold-400 text-navy-900 font-semibold text-sm tracking-wide transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? "Signing in..." : "Sign in"}
+              {isLoading ? "Signing in..." : "Sign In"}
             </button>
           </form>
 
-          <div className="mt-8 rounded-lg bg-gray-100 p-4">
-            <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">Demo accounts</p>
-            <div className="space-y-1 text-sm text-gray-600">
-              <p>
-                <span className="font-medium">Attorney:</span> attorney@counselintake.com
-              </p>
-              <p>
-                <span className="font-medium">Staff:</span> staff@counselintake.com
-              </p>
-              <p className="text-xs text-gray-400 mt-1">Any password works in demo mode</p>
+          <div className="mt-8 p-4 bg-navy-800/50 border border-navy-500">
+            <p className="text-xs font-semibold text-gold/80 uppercase tracking-wider mb-3">Demo Accounts</p>
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between">
+                <span className="text-slate-400">Attorney:</span>
+                <span className="text-slate-300 font-mono text-xs">attorney@counselintake.com</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-400">Staff:</span>
+                <span className="text-slate-300 font-mono text-xs">staff@counselintake.com</span>
+              </div>
+              <p className="text-slate-500 text-xs mt-2 pt-2 border-t border-navy-500">Any password works in demo mode</p>
             </div>
           </div>
         </div>

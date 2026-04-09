@@ -1,118 +1,113 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AppShell from "@/components/layout/app-shell";
+import StatusBadge from "@/components/ui/status-badge";
 import { mockCases } from "@/lib/mock-data";
-import { StatusBadge } from "@/components/ui/status-badge";
+import { Case } from "@/types";
+import { Search, Plus } from "lucide-react";
 import Link from "next/link";
-import type { CaseStatus } from "@/types";
 
-const statusFilters: { label: string; value: CaseStatus | "all" }[] = [
-  { label: "All", value: "all" },
-  { label: "Intake", value: "intake" },
-  { label: "Active", value: "active" },
-  { label: "Discovery", value: "discovery" },
-  { label: "Negotiation", value: "negotiation" },
-  { label: "Litigation", value: "litigation" },
-  { label: "Settled", value: "settled" },
-  { label: "Closed", value: "closed" },
-];
+const statuses = ["All", "Intake", "Active", "Discovery", "Negotiation", "Litigation", "Settled", "Closed"];
 
 export default function CasesPage() {
-  const [filter, setFilter] = useState<CaseStatus | "all">("all");
+  const [cases, setCases] = useState<Case[]>([]);
   const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState("All");
 
-  const filtered = mockCases.filter((c) => {
-    if (filter !== "all" && c.status !== filter) return false;
-    if (search) {
-      const q = search.toLowerCase();
-      return (
-        c.title.toLowerCase().includes(q) ||
-        c.clientName.toLowerCase().includes(q) ||
-        c.caseNumber.toLowerCase().includes(q)
-      );
-    }
-    return true;
+  useEffect(() => {
+    setCases(mockCases);
+  }, []);
+
+  const filtered = cases.filter((c) => {
+    const matchesSearch =
+      c.title.toLowerCase().includes(search.toLowerCase()) ||
+      c.caseNumber.toLowerCase().includes(search.toLowerCase()) ||
+      c.client.toLowerCase().includes(search.toLowerCase());
+    const matchesFilter = filter === "All" || c.status.toLowerCase() === filter.toLowerCase();
+    return matchesSearch && matchesFilter;
   });
 
   return (
     <AppShell>
-      <div className="mb-6 flex items-center justify-between">
+      <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Cases</h1>
-          <p className="mt-1 text-sm text-gray-500">{mockCases.length} total cases</p>
+          <h1 className="text-2xl font-bold text-white tracking-tight">Cases</h1>
+          <p className="text-sm text-slate-400 mt-1">{filtered.length} total cases</p>
         </div>
-        <button className="rounded-lg bg-brand-700 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-brand-800 transition-colors">
-          + New Case
+        <button className="flex items-center gap-2 px-4 py-2.5 bg-gold hover:bg-gold-400 text-navy-900 text-sm font-semibold transition-colors">
+          <Plus size={16} strokeWidth={2} />
+          New Case
         </button>
       </div>
 
-      {/* Search & Filters */}
-      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center">
-        <input
-          type="text"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search cases..."
-          className="w-full sm:w-80 rounded-lg border border-gray-300 px-4 py-2 text-sm shadow-sm placeholder:text-gray-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 focus:outline-none"
-        />
-        <div className="flex flex-wrap gap-1.5">
-          {statusFilters.map((f) => (
+      {/* Search + Filters */}
+      <div className="flex flex-wrap items-center gap-3 mb-6">
+        <div className="relative flex-1 max-w-sm">
+          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+          <input
+            type="text"
+            placeholder="Search cases..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full pl-10 pr-4 py-2.5 bg-navy-800 border border-navy-500 text-white text-sm placeholder-slate-500 focus:outline-none focus:border-gold/50 transition-colors"
+          />
+        </div>
+        <div className="flex gap-1">
+          {statuses.map((s) => (
             <button
-              key={f.value}
-              onClick={() => setFilter(f.value)}
-              className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
-                filter === f.value
-                  ? "bg-brand-700 text-white"
-                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+              key={s}
+              onClick={() => setFilter(s)}
+              className={`px-3 py-1.5 text-xs font-medium transition-colors ${
+                filter === s
+                  ? "bg-gold/15 text-gold border border-gold/30"
+                  : "text-slate-400 hover:text-white border border-transparent hover:border-navy-400"
               }`}
             >
-              {f.label}
+              {s}
             </button>
           ))}
         </div>
       </div>
 
-      {/* Cases Table */}
-      <div className="rounded-xl border border-gray-200 bg-white overflow-hidden">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Case</th>
-              <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Client</th>
-              <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Type</th>
-              <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Status</th>
-              <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Assigned</th>
-              <th className="px-5 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Court Date</th>
+      {/* Table */}
+      <div className="bg-navy-800 border border-navy-500 overflow-hidden">
+        <table className="w-full">
+          <thead>
+            <tr className="border-b border-navy-500">
+              <th className="text-left px-5 py-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">Case</th>
+              <th className="text-left px-5 py-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">Client</th>
+              <th className="text-left px-5 py-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">Type</th>
+              <th className="text-left px-5 py-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">Status</th>
+              <th className="text-left px-5 py-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">Assigned</th>
+              <th className="text-left px-5 py-3 text-xs font-semibold text-slate-400 uppercase tracking-wider">Court Date</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody className="divide-y divide-navy-600/50">
             {filtered.map((c) => (
-              <tr key={c.id} className="hover:bg-gray-50 transition-colors">
+              <tr key={c.id} className="hover:bg-navy-700/30 transition-colors">
                 <td className="px-5 py-4">
                   <Link href={`/cases/${c.id}`} className="group">
-                    <p className="text-sm font-medium text-gray-900 group-hover:text-brand-700">{c.title}</p>
-                    <p className="text-xs text-gray-500">{c.caseNumber}</p>
+                    <p className="text-sm font-medium text-white group-hover:text-gold transition-colors">{c.title}</p>
+                    <p className="text-xs text-slate-500 mt-0.5">{c.caseNumber}</p>
                   </Link>
                 </td>
-                <td className="px-5 py-4 text-sm text-gray-700">{c.clientName}</td>
-                <td className="px-5 py-4 text-sm text-gray-700">{c.caseType}</td>
-                <td className="px-5 py-4"><StatusBadge status={c.status} type="case" /></td>
-                <td className="px-5 py-4 text-sm text-gray-700">{c.assignedToName}</td>
-                <td className="px-5 py-4 text-sm text-gray-700">
-                  {c.courtDate
-                    ? new Date(c.courtDate).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
-                    : "\u2014"}
+                <td className="px-5 py-4 text-sm text-slate-300">{c.client}</td>
+                <td className="px-5 py-4 text-sm text-slate-400">{c.type}</td>
+                <td className="px-5 py-4">
+                  <StatusBadge status={c.status} variant="case" />
+                </td>
+                <td className="px-5 py-4 text-sm text-slate-300">{c.assignedAttorney}</td>
+                <td className="px-5 py-4 text-sm text-slate-400">
+                  {c.courtDate ? new Date(c.courtDate).toLocaleDateString() : <span className="text-slate-600">&mdash;</span>}
                 </td>
               </tr>
             ))}
-            {filtered.length === 0 && (
-              <tr>
-                <td colSpan={6} className="px-5 py-12 text-center text-sm text-gray-500">No cases found matching your criteria.</td>
-              </tr>
-            )}
           </tbody>
         </table>
+        {filtered.length === 0 && (
+          <div className="px-5 py-12 text-center text-slate-500 text-sm">No cases found matching your criteria.</div>
+        )}
       </div>
     </AppShell>
   );

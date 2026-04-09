@@ -1,118 +1,120 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AppShell from "@/components/layout/app-shell";
+import StatusBadge from "@/components/ui/status-badge";
 import { useAuth } from "@/context/auth-context";
 import { mockRequests } from "@/lib/mock-data";
-import { StatusBadge } from "@/components/ui/status-badge";
-import type { RequestStatus } from "@/types";
+import { Request } from "@/types";
+import { Search, Plus, Check, X } from "lucide-react";
 
-const statusFilters: { label: string; value: RequestStatus | "all" }[] = [
-  { label: "All", value: "all" },
-  { label: "Pending", value: "pending" },
-  { label: "Approved", value: "approved" },
-  { label: "In Progress", value: "in_progress" },
-  { label: "Completed", value: "completed" },
-  { label: "Denied", value: "denied" },
-];
+const statuses = ["All", "Pending", "Approved", "In Progress", "Completed", "Denied"];
 
 export default function RequestsPage() {
-  const { isAttorney } = useAuth();
-  const [filter, setFilter] = useState<RequestStatus | "all">("all");
+  const { user } = useAuth();
+  const [requests, setRequests] = useState<Request[]>([]);
   const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState("All");
 
-  const filtered = mockRequests.filter((r) => {
-    if (filter !== "all" && r.status !== filter) return false;
-    if (search) {
-      const q = search.toLowerCase();
-      return r.title.toLowerCase().includes(q) || r.description.toLowerCase().includes(q);
-    }
-    return true;
+  useEffect(() => {
+    setRequests(mockRequests);
+  }, []);
+
+  const filtered = requests.filter((r) => {
+    const matchesSearch =
+      r.title.toLowerCase().includes(search.toLowerCase()) ||
+      r.caseName.toLowerCase().includes(search.toLowerCase());
+    const matchesFilter =
+      filter === "All" ||
+      r.status.toLowerCase().replace("_", " ") === filter.toLowerCase();
+    return matchesSearch && matchesFilter;
   });
+
+  const pendingCount = requests.filter((r) => r.status === "pending").length;
+  const isAttorney = user?.role === "attorney";
 
   return (
     <AppShell>
-      <div className="mb-6 flex items-center justify-between">
+      <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Requests</h1>
-          <p className="mt-1 text-sm text-gray-500">
-            {mockRequests.length} total requests &middot;{" "}
-            {mockRequests.filter((r) => r.status === "pending").length} pending approval
+          <h1 className="text-2xl font-bold text-white tracking-tight">Requests</h1>
+          <p className="text-sm text-slate-400 mt-1">
+            {filtered.length} total requests {pendingCount > 0 && <span className="text-gold">&middot; {pendingCount} pending approval</span>}
           </p>
         </div>
-        <button className="rounded-lg bg-brand-700 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-brand-800 transition-colors">
-          + New Request
+        <button className="flex items-center gap-2 px-4 py-2.5 bg-gold hover:bg-gold-400 text-navy-900 text-sm font-semibold transition-colors">
+          <Plus size={16} strokeWidth={2} />
+          New Request
         </button>
       </div>
 
-      {/* Search & Filters */}
-      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center">
-        <input
-          type="text"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search requests..."
-          className="w-full sm:w-80 rounded-lg border border-gray-300 px-4 py-2 text-sm shadow-sm placeholder:text-gray-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 focus:outline-none"
-        />
-        <div className="flex flex-wrap gap-1.5">
-          {statusFilters.map((f) => (
+      {/* Search + Filters */}
+      <div className="flex flex-wrap items-center gap-3 mb-6">
+        <div className="relative flex-1 max-w-sm">
+          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+          <input
+            type="text"
+            placeholder="Search requests..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full pl-10 pr-4 py-2.5 bg-navy-800 border border-navy-500 text-white text-sm placeholder-slate-500 focus:outline-none focus:border-gold/50 transition-colors"
+          />
+        </div>
+        <div className="flex gap-1">
+          {statuses.map((s) => (
             <button
-              key={f.value}
-              onClick={() => setFilter(f.value)}
-              className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
-                filter === f.value
-                  ? "bg-brand-700 text-white"
-                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+              key={s}
+              onClick={() => setFilter(s)}
+              className={`px-3 py-1.5 text-xs font-medium transition-colors ${
+                filter === s
+                  ? "bg-gold/15 text-gold border border-gold/30"
+                  : "text-slate-400 hover:text-white border border-transparent hover:border-navy-400"
               }`}
             >
-              {f.label}
+              {s}
             </button>
           ))}
         </div>
       </div>
 
-      {/* Requests list */}
+      {/* Request Cards */}
       <div className="space-y-3">
         {filtered.map((r) => (
           <div
             key={r.id}
-            className="rounded-xl border border-gray-200 bg-white p-5 hover:border-gray-300 transition-colors"
+            className="bg-navy-800 border border-navy-500 p-5 hover:border-navy-400 transition-colors"
           >
             <div className="flex items-start justify-between">
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-3 mb-1">
-                  <h3 className="text-sm font-semibold text-gray-900">{r.title}</h3>
-                  <StatusBadge status={r.priority} type="priority" />
-                  <StatusBadge status={r.status} type="request" />
+              <div className="flex-1">
+                <div className="flex items-center gap-3 mb-2">
+                  <h3 className="text-sm font-semibold text-white">{r.title}</h3>
+                  <StatusBadge status={r.priority} variant="priority" />
+                  <StatusBadge status={r.status} variant="request" />
                 </div>
-                <p className="text-sm text-gray-600 mb-2">{r.description}</p>
-                <div className="flex items-center gap-4 text-xs text-gray-500">
-                  {r.caseTitle && (
-                    <span className="flex items-center gap-1">
-                      <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M20 7H4a1 1 0 00-1 1v11a1 1 0 001 1h16a1 1 0 001-1V8a1 1 0 00-1-1z" />
-                      </svg>
-                      {r.caseTitle}
-                    </span>
+                <p className="text-sm text-slate-400 mb-3">{r.description}</p>
+                <div className="flex items-center gap-4 text-xs text-slate-500">
+                  <span>{r.caseName}</span>
+                  <span>&middot;</span>
+                  <span>Requested by {r.requestedBy}</span>
+                  <span>&middot;</span>
+                  <span>{new Date(r.createdAt).toLocaleDateString()}</span>
+                  {r.assignedTo && (
+                    <>
+                      <span>&middot;</span>
+                      <span>Assigned to {r.assignedTo}</span>
+                    </>
                   )}
-                  <span>Requested by {r.requestedByName}</span>
-                  <span>
-                    {new Date(r.createdAt).toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                    })}
-                  </span>
-                  {r.assignedToName && <span>Assigned to {r.assignedToName}</span>}
                 </div>
               </div>
 
-              {/* Attorney approval controls */}
               {isAttorney && r.status === "pending" && (
-                <div className="flex items-center gap-2 ml-4">
-                  <button className="rounded-lg bg-green-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-green-700 transition-colors">
+                <div className="flex items-center gap-2 ml-6 flex-shrink-0">
+                  <button className="flex items-center gap-1.5 px-3.5 py-2 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-semibold hover:bg-emerald-500/20 transition-colors">
+                    <Check size={14} />
                     Approve
                   </button>
-                  <button className="rounded-lg border border-gray-300 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-50 transition-colors">
+                  <button className="flex items-center gap-1.5 px-3.5 py-2 bg-navy-700 border border-navy-400 text-slate-300 text-xs font-semibold hover:text-red-400 hover:border-red-500/30 transition-colors">
+                    <X size={14} />
                     Deny
                   </button>
                 </div>
@@ -120,13 +122,13 @@ export default function RequestsPage() {
             </div>
           </div>
         ))}
-
-        {filtered.length === 0 && (
-          <div className="rounded-xl border border-gray-200 bg-white px-5 py-12 text-center text-sm text-gray-500">
-            No requests found.
-          </div>
-        )}
       </div>
+
+      {filtered.length === 0 && (
+        <div className="bg-navy-800 border border-navy-500 px-5 py-12 text-center text-slate-500 text-sm">
+          No requests found matching your criteria.
+        </div>
+      )}
     </AppShell>
   );
 }

@@ -1,8 +1,8 @@
 "use client";
 
-import { useAuth } from "@/context/auth-context";
-import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/auth-context";
 import Sidebar from "./sidebar";
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
@@ -17,10 +17,10 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
 
   if (loading) {
     return (
-      <div className="flex h-screen items-center justify-center bg-gray-50">
-        <div className="flex flex-col items-center gap-3">
-          <div className="h-8 w-8 animate-spin rounded-full border-4 border-brand-200 border-t-brand-700" />
-          <p className="text-sm text-gray-500">Loading...</p>
+      <div className="flex items-center justify-center min-h-screen bg-navy-900">
+        <div className="flex items-center gap-3">
+          <div className="w-2 h-2 bg-gold rounded-full animate-pulse" />
+          <span className="text-sm text-slate-400 tracking-wide">Loading...</span>
         </div>
       </div>
     );
@@ -29,10 +29,10 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   if (!user) return null;
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="min-h-screen bg-navy-900">
       <Sidebar />
-      <main className="flex-1 overflow-y-auto">
-        <div className="mx-auto max-w-7xl px-6 py-8">{children}</div>
+      <main className="ml-60 min-h-screen">
+        <div className="p-8">{children}</div>
       </main>
     </div>
   );
