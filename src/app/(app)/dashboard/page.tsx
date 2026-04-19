@@ -90,10 +90,10 @@ export default function DashboardPage() {
   const token = session?.token ?? null;
   const isAttorney = session?.user.role === "attorney";
 
-  const cases = useAuthedQuery(casesApi.list, token);
-  const requests = useAuthedQuery(requestsApi.list, token);
-  const drafts = useAuthedQuery(draftsApi.list, token);
-  const notifs = useAuthedQuery(notificationsApi.list, token);
+  const cases = useAuthedQuery(casesApi.list, token, "firms/me/cases");
+  const requests = useAuthedQuery(requestsApi.list, token, "firms/me/requests");
+  const drafts = useAuthedQuery(draftsApi.list, token, "firms/me/drafts");
+  const notifs = useAuthedQuery(notificationsApi.list, token, "notifications");
 
   const { activeCases, blockedCases, statusBreakdown } = useMemo(() => {
     const list = cases.data ?? [];

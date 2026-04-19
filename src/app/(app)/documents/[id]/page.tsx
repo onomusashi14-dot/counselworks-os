@@ -34,8 +34,8 @@ export default function DocumentDetailPage() {
   const isAttorney = session?.user.role === "attorney";
 
   const fetchDraft = useCallback((t: string) => draftsApi.get(t, id), [id]);
-  const draftQ = useAuthedQuery(fetchDraft, token);
-  const casesQ = useAuthedQuery(casesApi.list, token);
+  const draftQ = useAuthedQuery(fetchDraft, token, `firms/me/drafts/${id}`);
+  const casesQ = useAuthedQuery(casesApi.list, token, "firms/me/cases");
 
   const [acting, setActing] = useState<"approve" | "reject" | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);

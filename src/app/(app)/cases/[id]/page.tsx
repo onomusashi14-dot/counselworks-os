@@ -39,9 +39,9 @@ export default function CaseDetailPage() {
     [id]
   );
 
-  const caseQ = useAuthedQuery(fetchCase, token);
-  const requestsQ = useAuthedQuery(requestsApi.list, token);
-  const draftsQ = useAuthedQuery(draftsApi.list, token);
+  const caseQ = useAuthedQuery(fetchCase, token, `firms/me/cases/${id}`);
+  const requestsQ = useAuthedQuery(requestsApi.list, token, "firms/me/requests");
+  const draftsQ = useAuthedQuery(draftsApi.list, token, "firms/me/drafts");
 
   const relatedRequests = useMemo<ClientRequest[]>(
     () => (requestsQ.data ?? []).filter((r) => caseIdOf(r) === id),

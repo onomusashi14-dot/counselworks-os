@@ -57,7 +57,7 @@ export default function CasesPage() {
   );
   const [q, setQ] = useState("");
 
-  const { data, error, loading } = useAuthedQuery(casesApi.list, token);
+  const { data, error, loading } = useAuthedQuery(casesApi.list, token, "firms/me/cases");
 
   useEffect(() => {
     const current = params.get("filter") || "active";

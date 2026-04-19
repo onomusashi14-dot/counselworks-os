@@ -194,8 +194,8 @@ export default function RequestsPage() {
   const [q, setQ] = useState("");
   const [creating, setCreating] = useState(false);
 
-  const requests = useAuthedQuery(requestsApi.list, token);
-  const cases = useAuthedQuery(casesApi.list, token);
+  const requests = useAuthedQuery(requestsApi.list, token, "firms/me/requests");
+  const cases = useAuthedQuery(casesApi.list, token, "firms/me/cases");
 
   useEffect(() => {
     const current = params.get("filter");

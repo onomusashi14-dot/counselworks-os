@@ -64,8 +64,8 @@ export default function DocumentsPage() {
   );
   const [q, setQ] = useState("");
 
-  const drafts = useAuthedQuery(draftsApi.list, token);
-  const cases = useAuthedQuery(casesApi.list, token);
+  const drafts = useAuthedQuery(draftsApi.list, token, "firms/me/drafts");
+  const cases = useAuthedQuery(casesApi.list, token, "firms/me/cases");
 
   useEffect(() => {
     const current = params.get("filter");

@@ -30,8 +30,8 @@ export default function RequestDetailPage() {
   const currentUserId = session?.user.id;
 
   const fetchReq = useCallback((t: string) => requestsApi.get(t, id), [id]);
-  const reqQ = useAuthedQuery(fetchReq, token);
-  const casesQ = useAuthedQuery(casesApi.list, token);
+  const reqQ = useAuthedQuery(fetchReq, token, `firms/me/requests/${id}`);
+  const casesQ = useAuthedQuery(casesApi.list, token, "firms/me/cases");
 
   const [acting, setActing] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
