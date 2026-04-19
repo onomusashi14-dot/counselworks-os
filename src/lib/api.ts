@@ -1,6 +1,4 @@
-export const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL ||
-  "https://counselworks-api-production.up.railway.app";
+export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "/api";
 
 export type ApiError = {
   status: number;
