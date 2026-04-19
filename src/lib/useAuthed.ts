@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { ApiError } from "./api";
 
 export type LoadState<T> = {
@@ -19,29 +19,34 @@ export function useAuthedQuery<T>(
   const [loading, setLoading] = useState(true);
   const [tick, setTick] = useState(0);
 
+  const fetcherRef = useRef(fetcher);
+  fetcherRef.current = fetcher;
+
   useEffect(() => {
-    if (!token) return;
+    if (!token) {
+      setLoading(false);
+      return;
+    }
     let alive = true;
     setLoading(true);
     setError(null);
-    fetcher(token)
+    fetcherRef.current(token)
       .then((d) => {
-        if (alive) {
-          setData(d);
-          setLoading(false);
-        }
+        if (!alive) return;
+        setData(d);
+        setLoading(false);
       })
       .catch((e) => {
+        if (!alive) return;
         const err = e as ApiError;
-        if (alive) {
-          setError(err?.message || "Failed to load");
-          setLoading(false);
-        }
+        setError(err?.message || "Failed to load");
+        setLoading(false);
       });
     return () => {
       alive = false;
     };
-  }, [token, fetcher, tick]);
+  }, [token, tick]);
 
-  return { data, error, loading, reload: () => setTick((t) => t + 1) };
+  const reload = useCallback(() => setTick((t) => t + 1), []);
+  return { data, error, loading, reload };
 }

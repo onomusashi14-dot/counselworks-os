@@ -60,14 +60,13 @@ export default function CasesPage() {
   const { data, error, loading } = useAuthedQuery(casesApi.list, token);
 
   useEffect(() => {
-    const current = params.get("filter");
-    if (filter !== current) {
-      const next = new URLSearchParams(params.toString());
-      if (filter === "active") next.delete("filter");
-      else next.set("filter", filter);
-      const qs = next.toString();
-      router.replace(qs ? `/cases?${qs}` : "/cases", { scroll: false });
-    }
+    const current = params.get("filter") || "active";
+    if (filter === current) return;
+    const next = new URLSearchParams(params.toString());
+    if (filter === "active") next.delete("filter");
+    else next.set("filter", filter);
+    const qs = next.toString();
+    router.replace(qs ? `/cases?${qs}` : "/cases", { scroll: false });
   }, [filter, params, router]);
 
   const counts = useMemo(() => {
