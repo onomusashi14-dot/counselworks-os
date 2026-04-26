@@ -148,3 +148,20 @@ export function updatedAt(obj: {
 }): string | undefined {
   return obj.updatedAt ?? obj.updated_at ?? obj.createdAt ?? obj.created_at;
 }
+
+
+export type CWFile = {
+  id: string;
+  originalName: string;
+  mimeType: string;
+  sizeBytes: string;
+  documentType: string;
+  status: string;
+  reviewStatus?: string;
+  createdAt: string;
+  uploadedBy: string;
+  entityType?: string | null;
+  entityId?: string | null;
+  linkId?: string | null;
+  linkedAt?: string | null;
+};
