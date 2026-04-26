@@ -18,6 +18,16 @@ function asList<T>(payload: unknown): T[] {
   return [];
 }
 
+function asOne<T>(payload: unknown, ...keys: string[]): T {
+  if (payload && typeof payload === "object") {
+    const p = payload as Record<string, unknown>;
+    for (const key of keys) {
+      if (p[key] && typeof p[key] === "object") return p[key] as T;
+    }
+  }
+  return payload as T;
+}
+
 export const firmsApi = {
   me: (token: string) => api.get<Firm>("/firms/me", token),
 };
@@ -27,8 +37,10 @@ export const casesApi = {
     const payload = await api.get<unknown>("/firms/me/cases", token);
     return asList<Case>(payload);
   },
-  get: (token: string, id: string) =>
-    api.get<Case>(`/firms/me/cases/${id}`, token),
+  get: async (token: string, id: string) => {
+    const payload = await api.get<unknown>(`/firms/me/cases/${id}`, token);
+    return asOne<Case>(payload, "case");
+  },
 };
 
 export type RequestPatch = Partial<
@@ -50,8 +62,10 @@ export const requestsApi = {
     const payload = await api.get<unknown>("/firms/me/requests", token);
     return asList<ClientRequest>(payload);
   },
-  get: (token: string, id: string) =>
-    api.get<ClientRequest>(`/firms/me/requests/${id}`, token),
+  get: async (token: string, id: string) => {
+    const payload = await api.get<unknown>(`/firms/me/requests/${id}`, token);
+    return asOne<ClientRequest>(payload, "request");
+  },
   update: (token: string, id: string, patch: RequestPatch) =>
     api.patch<ClientRequest>(`/firms/me/requests/${id}`, patch, token),
   create: (token: string, body: RequestCreate) =>
@@ -63,8 +77,10 @@ export const draftsApi = {
     const payload = await api.get<unknown>("/firms/me/drafts", token);
     return asList<Draft>(payload);
   },
-  get: (token: string, id: string) =>
-    api.get<Draft>(`/firms/me/drafts/${id}`, token),
+  get: async (token: string, id: string) => {
+    const payload = await api.get<unknown>(`/firms/me/drafts/${id}`, token);
+    return asOne<Draft>(payload, "draft");
+  },
   approve: (token: string, id: string) =>
     api.post<Draft>(`/firms/me/drafts/${id}/approve`, {}, token),
   reject: (token: string, id: string, reason?: string) =>
