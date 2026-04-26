@@ -2,6 +2,7 @@ import { api } from "./api";
 import type {
   Case,
   ClientRequest,
+  CWFile,
   Draft,
   Firm,
   Notification,
@@ -11,7 +12,7 @@ function asList<T>(payload: unknown): T[] {
   if (Array.isArray(payload)) return payload as T[];
   if (payload && typeof payload === "object") {
     const p = payload as Record<string, unknown>;
-    for (const key of ["items", "data", "results", "records", "cases", "requests", "drafts", "notifications"]) {
+    for (const key of ["items", "data", "results", "records", "cases", "requests", "drafts", "notifications", "files"]) {
       if (Array.isArray(p[key])) return p[key] as T[];
     }
   }
@@ -91,5 +92,12 @@ export const notificationsApi = {
   list: async (token: string) => {
     const payload = await api.get<unknown>("/notifications", token);
     return asList<Notification>(payload);
+  },
+};
+
+export const filesApi = {
+  list: async (token: string, firmId: string) => {
+    const payload = await api.get<unknown>(`/api/files?firmId=${firmId}`, token);
+    return asList<CWFile>(payload);
   },
 };
