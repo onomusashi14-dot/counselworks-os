@@ -74,7 +74,7 @@ export default function CaseDetailPage() {
         <div className="mt-4 card p-5">
           <ErrorRow message={caseQ.error || "This case could not be loaded."} />
           <Link href="/cases" className="mt-4 inline-block btn-secondary">
-            ← Back to cases
+            â Back to cases
           </Link>
         </div>
       </div>
@@ -106,7 +106,7 @@ export default function CaseDetailPage() {
           role="alert"
           className="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-status-risk flex items-start gap-2"
         >
-          <span className="font-semibold">⚠ Blocker:</span>
+          <span className="font-semibold">â  Blocker:</span>
           <span className="text-ink-700">{c.blocker}</span>
         </div>
       )}
@@ -143,7 +143,7 @@ export default function CaseDetailPage() {
                     {requestDisplayTitle(r)}
                   </div>
                   <div className="truncate text-xs text-ink-500">
-                    {r.clientName || r.client_name || r.email || "—"} · updated{" "}
+                    {r.clientName || r.client_name || r.email || "â"} Â· updated{" "}
                     {relativeTime(updatedAt(r))}
                   </div>
                 </div>
@@ -210,11 +210,11 @@ export default function CaseDetailPage() {
               </dd>
               <dt className="col-span-1 text-ink-500">Client</dt>
               <dd className="col-span-2 text-ink-900 truncate">
-                {c.clientName || c.client_name || "—"}
+                {c.clientName || c.client_name || "â"}
               </dd>
               <dt className="col-span-1 text-ink-500">Attorney</dt>
               <dd className="col-span-2 text-ink-900 truncate">
-                {c.attorneyId || c.attorney_id || "Unassigned"}
+                {c.primaryAttorneyId || c.primary_attorney_id || c.attorneyId || c.attorney_id || "Unassigned"}
               </dd>
               <dt className="col-span-1 text-ink-500">Opened</dt>
               <dd className="col-span-2 text-ink-700">
