@@ -117,6 +117,21 @@ const NAV: NavItem[] = [
       </svg>
     ),
   },
+  {
+    href: "/reports",
+    label: "Reports",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" aria-hidden>
+        <path
+          d="M18 20V10M12 20V4M6 20v-6"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    ),
+  },
 ];
 
 function initials(name?: string, email?: string) {
@@ -137,7 +152,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   if (!ready) {
     return (
       <div className="min-h-screen grid place-items-center text-ink-500 text-sm">
-        Loadingâ¦
+        Loading…
       </div>
     );
   }
