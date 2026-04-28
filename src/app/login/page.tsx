@@ -38,7 +38,7 @@ export default function LoginPage() {
     }
     setSubmitting(true);
     try {
-      const s = await login(email.trim(), password);
+      const s = await login(email.trim(), password, role);
       if (s.user.role !== role) {
         setError(
           `This account is registered as ${s.user.role}. Switch the role tab or use the correct login.`
