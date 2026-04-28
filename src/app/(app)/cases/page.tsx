@@ -100,22 +100,24 @@ export default function CasesPage() {
       />
 
       <div className="mt-5 flex flex-wrap items-center gap-3 justify-between">
-        <Tabs<Filter>
-          value={filter}
-          onChange={setFilter}
-          options={[
-            { value: "active", label: "Active", count: counts.active },
-            { value: "blocked", label: "Blocked", count: counts.blocked },
-            { value: "closed", label: "Closed", count: counts.closed },
-            { value: "all", label: "All", count: counts.all },
-          ]}
-        />
+        <div className="overflow-x-auto -mx-1 px-1">
+          <Tabs<Filter>
+            value={filter}
+            onChange={setFilter}
+            options={[
+              { value: "active", label: "Active", count: counts.active },
+              { value: "blocked", label: "Blocked", count: counts.blocked },
+              { value: "closed", label: "Closed", count: counts.closed },
+              { value: "all", label: "All", count: counts.all },
+            ]}
+          />
+        </div>
         <div className="relative">
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="Search by name, client, status"
-            className="input w-64 pl-9"
+            className="input w-full md:w-64 pl-9"
           />
           <svg
             viewBox="0 0 24 24"
@@ -154,73 +156,79 @@ export default function CasesPage() {
             />
           )}
           {!loading && !error && visible.length > 0 && (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead className="text-xs uppercase tracking-wide text-ink-500 bg-ink-100/40">
-                  <tr>
-                    <th className="text-left font-medium px-5 py-2.5">Case</th>
-                    <th className="text-left font-medium px-5 py-2.5">
-                      Client
-                    </th>
-                    <th className="text-left font-medium px-5 py-2.5">
-                      Status
-                    </th>
-                    <th className="text-right font-medium px-5 py-2.5">
-                      Open req.
-                    </th>
-                    <th className="text-right font-medium px-5 py-2.5">
-                      Pending drafts
-                    </th>
-                    <th className="text-right font-medium px-5 py-2.5">
-                      Updated
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-ink-100">
-                  {visible.map((c) => (
-                    <tr
-                      key={c.id}
-                      className="hover:bg-ink-100/40 cursor-pointer"
-                      onClick={() => router.push(`/cases/${c.id}`)}
-                    >
-                      <td className="px-5 py-3">
-                        <Link
-                          href={`/cases/${c.id}`}
-                          className="font-medium text-ink-900 hover:underline"
-                          onClick={(e) => e.stopPropagation()}
+            <>
+              <div className="hidden md:block">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead className="text-xs uppercase tracking-wide text-ink-500 bg-ink-100/40">
+                      <tr>
+                        <th className="text-left font-medium px-5 py-2.5">Case</th>
+                        <th className="text-left font-medium px-5 py-2.5">Client</th>
+                        <th className="text-left font-medium px-5 py-2.5">Status</th>
+                        <th className="text-right font-medium px-5 py-2.5">Open req.</th>
+                        <th className="text-right font-medium px-5 py-2.5">Pending drafts</th>
+                        <th className="text-right font-medium px-5 py-2.5">Updated</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-ink-100">
+                      {visible.map((c) => (
+                        <tr
+                          key={c.id}
+                          className="hover:bg-ink-100/40 cursor-pointer"
+                          onClick={() => router.push(`/cases/${c.id}`)}
                         >
-                          {caseDisplayName(c)}
-                        </Link>
-                        {c.blocker && (
-                          <div className="text-xs text-status-risk mt-0.5 truncate max-w-[280px]">
-                            ⚠ {c.blocker}
-                          </div>
-                        )}
-                      </td>
-                      <td className="px-5 py-3 text-ink-700 truncate max-w-[200px]">
-                        {caseClient(c)}
-                      </td>
-                      <td className="px-5 py-3">
-                        <span
-                          className={`badge ${statusTone(c.status)} capitalize`}
-                        >
-                          {humanStatus(c.status)}
-                        </span>
-                      </td>
-                      <td className="px-5 py-3 text-right tabular-nums text-ink-700">
-                        {openRequests(c)}
-                      </td>
-                      <td className="px-5 py-3 text-right tabular-nums text-ink-700">
-                        {pendingDrafts(c)}
-                      </td>
-                      <td className="px-5 py-3 text-right text-ink-500 text-xs whitespace-nowrap">
-                        {relativeTime(updatedAt(c))}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                          <td className="px-5 py-3">
+                            <Link
+                              href={`/cases/${c.id}`}
+                              className="font-medium text-ink-900 hover:underline"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              {caseDisplayName(c)}
+                            </Link>
+                            {c.blocker && (
+                              <div className="text-xs text-status-risk mt-0.5 truncate max-w-[280px]">
+                                ⚠ {c.blocker}
+                              </div>
+                            )}
+                          </td>
+                          <td className="px-5 py-3 text-ink-700 truncate max-w-[200px]">
+                            {caseClient(c)}
+                          </td>
+                          <td className="px-5 py-3">
+                            <span className={`badge ${statusTone(c.status)} capitalize`}>
+                              {humanStatus(c.status)}
+                            </span>
+                          </td>
+                          <td className="px-5 py-3 text-right tabular-nums text-ink-700">
+                            {openRequests(c)}
+                          </td>
+                          <td className="px-5 py-3 text-right tabular-nums text-ink-700">
+                            {pendingDrafts(c)}
+                          </td>
+                          <td className="px-5 py-3 text-right text-ink-500 text-xs whitespace-nowrap">
+                            {relativeTime(updatedAt(c))}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div className="block md:hidden divide-y divide-ink-100">
+                {visible.map((c) => (
+                  <Link key={c.id} href={`/cases/${c.id}`} className="block px-4 py-3 hover:bg-ink-100/40">
+                    <div className="flex items-center justify-between">
+                      <div className="font-medium text-ink-900 truncate">{caseDisplayName(c)}</div>
+                      <span className={`badge ${statusTone(c.status)} capitalize`}>{humanStatus(c.status)}</span>
+                    </div>
+                    <div className="mt-1.5 flex flex-wrap gap-x-4 gap-y-1 text-xs text-ink-500">
+                      <span>Client: {caseClient(c)}</span>
+                      <span>Updated: {relativeTime(updatedAt(c))}</span>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </>
           )}
         </SectionCard>
       </div>

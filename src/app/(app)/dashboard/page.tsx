@@ -63,7 +63,7 @@ function Kpi({
           <div className="text-xs font-medium uppercase tracking-wide text-ink-500">
             {label}
           </div>
-          <div className="mt-2 text-3xl font-semibold text-ink-900 tabular-nums">
+          <div className="mt-2 text-2xl sm:text-3xl font-semibold text-ink-900 tabular-nums">
             {value}
           </div>
           {sub && <div className="mt-1 text-xs text-ink-500">{sub}</div>}
@@ -163,7 +163,7 @@ export default function DashboardPage() {
         </div>
       </header>
 
-      <section className="mt-6 grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <section className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <Kpi
           label="New leads"
           value={requests.loading ? "—" : newLeads.length}

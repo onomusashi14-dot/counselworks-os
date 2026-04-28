@@ -110,24 +110,26 @@ export default function DraftsPage() {
       />
 
       <div className="mt-5 flex flex-wrap items-center gap-3 justify-between">
-        <Tabs<Filter>
-          value={filter}
-          onChange={setFilter}
-          options={[
-            { value: "drafted", label: "Drafted", count: counts.drafted },
-            { value: "in_review", label: "In Review", count: counts.in_review },
-            { value: "needs_revision", label: "Revision", count: counts.needs_revision },
-            { value: "approved", label: "Approved", count: counts.approved },
-            { value: "delivered", label: "Delivered", count: counts.delivered },
-            { value: "all", label: "All", count: counts.all },
-          ]}
-        />
+        <div className="overflow-x-auto -mx-1 px-1">
+          <Tabs<Filter>
+            value={filter}
+            onChange={setFilter}
+            options={[
+              { value: "drafted", label: "Drafted", count: counts.drafted },
+              { value: "in_review", label: "In Review", count: counts.in_review },
+              { value: "needs_revision", label: "Revision", count: counts.needs_revision },
+              { value: "approved", label: "Approved", count: counts.approved },
+              { value: "delivered", label: "Delivered", count: counts.delivered },
+              { value: "all", label: "All", count: counts.all },
+            ]}
+          />
+        </div>
         <div className="relative">
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="Search title, author, case"
-            className="input w-64 pl-9"
+            className="input w-full md:w-64 pl-9"
           />
           <svg
             viewBox="0 0 24 24"
@@ -155,71 +157,93 @@ export default function DraftsPage() {
             />
           )}
           {!drafts.loading && !drafts.error && visible.length > 0 && (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead className="text-xs uppercase tracking-wide text-ink-500 bg-ink-100/40">
-                  <tr>
-                    <th className="text-left font-medium px-5 py-2.5">Draft</th>
-                    <th className="text-left font-medium px-5 py-2.5">Type</th>
-                    <th className="text-left font-medium px-5 py-2.5">Status</th>
-                    <th className="text-left font-medium px-5 py-2.5">Case</th>
-                    <th className="text-left font-medium px-5 py-2.5">Author</th>
-                    <th className="text-right font-medium px-5 py-2.5">Updated</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-ink-100">
-                  {visible.map((d) => {
-                    const caseId = d.caseId || d.case_id || null;
-                    const caseObj = caseId ? caseById.get(caseId) : undefined;
-                    const dType = d.draftType || d.draft_type || d.type || "";
-                    return (
-                      <tr
-                        key={d.id}
-                        className="hover:bg-ink-100/40 cursor-pointer"
-                        onClick={() => router.push(`/drafts/${d.id}`)}
-                      >
-                        <td className="px-5 py-3">
-                          <Link
-                            href={`/drafts/${d.id}`}
-                            className="font-medium text-ink-900 hover:underline"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            {draftDisplayTitle(d)}
-                          </Link>
-                        </td>
-                        <td className="px-5 py-3 text-ink-500 text-xs capitalize">
-                          {dType ? humanStatus(dType) : "—"}
-                        </td>
-                        <td className="px-5 py-3">
-                          <span className={`badge ${statusTone(d.status)} capitalize`}>
-                            {humanStatus(d.status)}
-                          </span>
-                        </td>
-                        <td className="px-5 py-3">
-                          {caseObj ? (
-                            <Link
-                              href={`/cases/${caseObj.id}`}
-                              className="text-brand-700 hover:underline truncate max-w-[180px] inline-block"
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              {caseDisplayName(caseObj)}
-                            </Link>
-                          ) : (
-                            <span className="text-ink-500">—</span>
-                          )}
-                        </td>
-                        <td className="px-5 py-3 text-ink-700 truncate max-w-[150px]">
-                          {d.authorName || d.author_name || "—"}
-                        </td>
-                        <td className="px-5 py-3 text-right text-ink-500 text-xs whitespace-nowrap">
-                          {relativeTime(updatedAt(d))}
-                        </td>
+            <>
+              <div className="hidden md:block">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead className="text-xs uppercase tracking-wide text-ink-500 bg-ink-100/40">
+                      <tr>
+                        <th className="text-left font-medium px-5 py-2.5">Draft</th>
+                        <th className="text-left font-medium px-5 py-2.5">Type</th>
+                        <th className="text-left font-medium px-5 py-2.5">Status</th>
+                        <th className="text-left font-medium px-5 py-2.5">Case</th>
+                        <th className="text-left font-medium px-5 py-2.5">Author</th>
+                        <th className="text-right font-medium px-5 py-2.5">Updated</th>
                       </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
+                    </thead>
+                    <tbody className="divide-y divide-ink-100">
+                      {visible.map((d) => {
+                        const caseId = d.caseId || d.case_id || null;
+                        const caseObj = caseId ? caseById.get(caseId) : undefined;
+                        const dType = d.draftType || d.draft_type || d.type || "";
+                        return (
+                          <tr
+                            key={d.id}
+                            className="hover:bg-ink-100/40 cursor-pointer"
+                            onClick={() => router.push(`/drafts/${d.id}`)}
+                          >
+                            <td className="px-5 py-3">
+                              <Link
+                                href={`/drafts/${d.id}`}
+                                className="font-medium text-ink-900 hover:underline"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                {draftDisplayTitle(d)}
+                              </Link>
+                            </td>
+                            <td className="px-5 py-3 text-ink-500 text-xs capitalize">
+                              {dType ? humanStatus(dType) : "—"}
+                            </td>
+                            <td className="px-5 py-3">
+                              <span className={`badge ${statusTone(d.status)} capitalize`}>
+                                {humanStatus(d.status)}
+                              </span>
+                            </td>
+                            <td className="px-5 py-3">
+                              {caseObj ? (
+                                <Link
+                                  href={`/cases/${caseObj.id}`}
+                                  className="text-brand-700 hover:underline truncate max-w-[180px] inline-block"
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  {caseDisplayName(caseObj)}
+                                </Link>
+                              ) : (
+                                <span className="text-ink-500">—</span>
+                              )}
+                            </td>
+                            <td className="px-5 py-3 text-ink-700 truncate max-w-[150px]">
+                              {d.authorName || d.author_name || "—"}
+                            </td>
+                            <td className="px-5 py-3 text-right text-ink-500 text-xs whitespace-nowrap">
+                              {relativeTime(updatedAt(d))}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div className="block md:hidden divide-y divide-ink-100">
+                {visible.map((d) => {
+                  const caseId = d.caseId || d.case_id || null;
+                  const caseObj = caseId ? caseById.get(caseId) : undefined;
+                  return (
+                    <Link key={d.id} href={`/drafts/${d.id}`} className="block px-4 py-3 hover:bg-ink-100/40">
+                      <div className="flex items-center justify-between">
+                        <div className="font-medium text-ink-900 truncate">{draftDisplayTitle(d)}</div>
+                        <span className={`badge ${statusTone(d.status)} capitalize`}>{humanStatus(d.status)}</span>
+                      </div>
+                      <div className="mt-1.5 flex flex-wrap gap-x-4 gap-y-1 text-xs text-ink-500">
+                        {caseObj && <span>Case: {caseDisplayName(caseObj)}</span>}
+                        <span>Updated: {relativeTime(updatedAt(d))}</span>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+            </>
           )}
         </SectionCard>
       </div>

@@ -93,23 +93,25 @@ export default function LeadsPage() {
       />
 
       <div className="mt-5 flex flex-wrap items-center gap-3 justify-between">
-        <Tabs<Filter>
-          value={filter}
-          onChange={setFilter}
-          options={[
-            { value: "open", label: "Open", count: counts.open },
-            { value: "in_progress", label: "In Progress", count: counts.in_progress },
-            { value: "completed", label: "Completed", count: counts.completed },
-            { value: "closed", label: "Closed", count: counts.closed },
-            { value: "all", label: "All", count: counts.all },
-          ]}
-        />
+        <div className="overflow-x-auto -mx-1 px-1">
+          <Tabs<Filter>
+            value={filter}
+            onChange={setFilter}
+            options={[
+              { value: "open", label: "Open", count: counts.open },
+              { value: "in_progress", label: "In Progress", count: counts.in_progress },
+              { value: "completed", label: "Completed", count: counts.completed },
+              { value: "closed", label: "Closed", count: counts.closed },
+              { value: "all", label: "All", count: counts.all },
+            ]}
+          />
+        </div>
         <div className="relative">
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="Search name, email, source"
-            className="input w-64 pl-9"
+            className="input w-full md:w-64 pl-9"
           />
           <svg
             viewBox="0 0 24 24"
@@ -137,56 +139,74 @@ export default function LeadsPage() {
             />
           )}
           {!loading && !error && visible.length > 0 && (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead className="text-xs uppercase tracking-wide text-ink-500 bg-ink-100/40">
-                  <tr>
-                    <th className="text-left font-medium px-5 py-2.5">Lead</th>
-                    <th className="text-left font-medium px-5 py-2.5">Client</th>
-                    <th className="text-left font-medium px-5 py-2.5">Email</th>
-                    <th className="text-left font-medium px-5 py-2.5">Status</th>
-                    <th className="text-left font-medium px-5 py-2.5">Source</th>
-                    <th className="text-right font-medium px-5 py-2.5">Received</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-ink-100">
-                  {visible.map((l) => (
-                    <tr
-                      key={l.id}
-                      className="hover:bg-ink-100/40 cursor-pointer"
-                      onClick={() => router.push(`/leads/${l.id}`)}
-                    >
-                      <td className="px-5 py-3">
-                        <Link
-                          href={`/leads/${l.id}`}
-                          className="font-medium text-ink-900 hover:underline"
-                          onClick={(e) => e.stopPropagation()}
+            <>
+              <div className="hidden md:block">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead className="text-xs uppercase tracking-wide text-ink-500 bg-ink-100/40">
+                      <tr>
+                        <th className="text-left font-medium px-5 py-2.5">Lead</th>
+                        <th className="text-left font-medium px-5 py-2.5">Client</th>
+                        <th className="text-left font-medium px-5 py-2.5">Email</th>
+                        <th className="text-left font-medium px-5 py-2.5">Status</th>
+                        <th className="text-left font-medium px-5 py-2.5">Source</th>
+                        <th className="text-right font-medium px-5 py-2.5">Received</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-ink-100">
+                      {visible.map((l) => (
+                        <tr
+                          key={l.id}
+                          className="hover:bg-ink-100/40 cursor-pointer"
+                          onClick={() => router.push(`/leads/${l.id}`)}
                         >
-                          {leadDisplayTitle(l)}
-                        </Link>
-                      </td>
-                      <td className="px-5 py-3 text-ink-700 truncate max-w-[180px]">
-                        {l.clientName || l.client_name || "—"}
-                      </td>
-                      <td className="px-5 py-3 text-ink-700 truncate max-w-[200px]">
-                        {l.email || "—"}
-                      </td>
-                      <td className="px-5 py-3">
-                        <span className={`badge ${statusTone(l.status)} capitalize`}>
-                          {humanStatus(l.status)}
-                        </span>
-                      </td>
-                      <td className="px-5 py-3 text-ink-500 text-xs">
-                        {l.source || "—"}
-                      </td>
-                      <td className="px-5 py-3 text-right text-ink-500 text-xs whitespace-nowrap">
-                        {relativeTime(l.createdAt || l.created_at)}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                          <td className="px-5 py-3">
+                            <Link
+                              href={`/leads/${l.id}`}
+                              className="font-medium text-ink-900 hover:underline"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              {leadDisplayTitle(l)}
+                            </Link>
+                          </td>
+                          <td className="px-5 py-3 text-ink-700 truncate max-w-[180px]">
+                            {l.clientName || l.client_name || "—"}
+                          </td>
+                          <td className="px-5 py-3 text-ink-700 truncate max-w-[200px]">
+                            {l.email || "—"}
+                          </td>
+                          <td className="px-5 py-3">
+                            <span className={`badge ${statusTone(l.status)} capitalize`}>
+                              {humanStatus(l.status)}
+                            </span>
+                          </td>
+                          <td className="px-5 py-3 text-ink-500 text-xs">
+                            {l.source || "—"}
+                          </td>
+                          <td className="px-5 py-3 text-right text-ink-500 text-xs whitespace-nowrap">
+                            {relativeTime(l.createdAt || l.created_at)}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div className="block md:hidden divide-y divide-ink-100">
+                {visible.map((l) => (
+                  <Link key={l.id} href={`/leads/${l.id}`} className="block px-4 py-3 hover:bg-ink-100/40">
+                    <div className="flex items-center justify-between">
+                      <div className="font-medium text-ink-900 truncate">{leadDisplayTitle(l)}</div>
+                      <span className={`badge ${statusTone(l.status)} capitalize`}>{humanStatus(l.status)}</span>
+                    </div>
+                    <div className="mt-1.5 flex flex-wrap gap-x-4 gap-y-1 text-xs text-ink-500">
+                      <span>Source: {l.source || "—"}</span>
+                      <span>Received: {relativeTime(l.createdAt || l.created_at)}</span>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </>
           )}
         </SectionCard>
       </div>

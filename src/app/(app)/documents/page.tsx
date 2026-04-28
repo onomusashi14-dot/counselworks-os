@@ -98,17 +98,19 @@ export default function DocumentsPage() {
       />
 
       <div className="mt-5 flex flex-wrap items-center gap-3 justify-between">
-        <Tabs<Filter>
-          value={filter}
-          onChange={setFilter}
-          options={tabOptions}
-        />
+        <div className="overflow-x-auto -mx-1 px-1">
+          <Tabs<Filter>
+            value={filter}
+            onChange={setFilter}
+            options={tabOptions}
+          />
+        </div>
         <div className="relative">
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="Search file name"
-            className="input w-64 pl-9"
+            className="input w-full md:w-64 pl-9"
           />
           <svg
             viewBox="0 0 24 24"
@@ -136,39 +138,57 @@ export default function DocumentsPage() {
             />
           )}
           {!filesQ.loading && !filesQ.error && visible.length > 0 && (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead className="text-xs uppercase tracking-wide text-ink-500 bg-ink-100/40">
-                  <tr>
-                    <th className="text-left font-medium px-5 py-2.5">File Name</th>
-                    <th className="text-left font-medium px-5 py-2.5">Type</th>
-                    <th className="text-left font-medium px-5 py-2.5">Size</th>
-                    <th className="text-right font-medium px-5 py-2.5">Uploaded</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-ink-100">
-                  {visible.map((f) => (
-                    <tr key={f.id} className="hover:bg-ink-100/40">
-                      <td className="px-5 py-3">
-                        <div className="font-medium text-ink-900 truncate max-w-[320px]">
-                          {f.originalName}
-                        </div>
-                        <div className="text-xs text-ink-500 mt-0.5">{f.mimeType}</div>
-                      </td>
-                      <td className="px-5 py-3">
-                        <span className="badge bg-ink-100 text-ink-700 capitalize">
-                          {humanDocType(f.documentType)}
-                        </span>
-                      </td>
-                      <td className="px-5 py-3 text-ink-700">{formatBytes(f.sizeBytes)}</td>
-                      <td className="px-5 py-3 text-right text-ink-500 text-xs whitespace-nowrap">
-                        {relativeTime(f.createdAt)}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <>
+              <div className="hidden md:block">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead className="text-xs uppercase tracking-wide text-ink-500 bg-ink-100/40">
+                      <tr>
+                        <th className="text-left font-medium px-5 py-2.5">File Name</th>
+                        <th className="text-left font-medium px-5 py-2.5">Type</th>
+                        <th className="text-left font-medium px-5 py-2.5">Size</th>
+                        <th className="text-right font-medium px-5 py-2.5">Uploaded</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-ink-100">
+                      {visible.map((f) => (
+                        <tr key={f.id} className="hover:bg-ink-100/40">
+                          <td className="px-5 py-3">
+                            <div className="font-medium text-ink-900 truncate max-w-[320px]">
+                              {f.originalName}
+                            </div>
+                            <div className="text-xs text-ink-500 mt-0.5">{f.mimeType}</div>
+                          </td>
+                          <td className="px-5 py-3">
+                            <span className="badge bg-ink-100 text-ink-700 capitalize">
+                              {humanDocType(f.documentType)}
+                            </span>
+                          </td>
+                          <td className="px-5 py-3 text-ink-700">{formatBytes(f.sizeBytes)}</td>
+                          <td className="px-5 py-3 text-right text-ink-500 text-xs whitespace-nowrap">
+                            {relativeTime(f.createdAt)}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div className="block md:hidden divide-y divide-ink-100">
+                {visible.map((f) => (
+                  <div key={f.id} className="block px-4 py-3 hover:bg-ink-100/40">
+                    <div className="flex items-center justify-between">
+                      <div className="font-medium text-ink-900 truncate">{f.originalName}</div>
+                      <span className="badge bg-ink-100 text-ink-700 capitalize">{humanDocType(f.documentType)}</span>
+                    </div>
+                    <div className="mt-1.5 flex flex-wrap gap-x-4 gap-y-1 text-xs text-ink-500">
+                      <span>Size: {formatBytes(f.sizeBytes)}</span>
+                      <span>Uploaded: {relativeTime(f.createdAt)}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
           )}
         </SectionCard>
       </div>

@@ -270,28 +270,30 @@ export default function RequestsPage() {
       />
 
       <div className="mt-5 flex flex-wrap items-center gap-3 justify-between">
-        <Tabs<Filter>
-          value={filter}
-          onChange={setFilter}
-          options={[
-            { value: "new", label: "New", count: counts.new },
-            { value: "triaged", label: "Triaged", count: counts.triaged },
-            { value: "assigned", label: "Assigned", count: counts.assigned },
-            {
-              value: "waiting_client",
-              label: "Waiting client",
-              count: counts.waiting_client,
-            },
-            { value: "closed", label: "Closed", count: counts.closed },
-            { value: "all", label: "All", count: counts.all },
-          ]}
-        />
+        <div className="overflow-x-auto -mx-1 px-1">
+          <Tabs<Filter>
+            value={filter}
+            onChange={setFilter}
+            options={[
+              { value: "new", label: "New", count: counts.new },
+              { value: "triaged", label: "Triaged", count: counts.triaged },
+              { value: "assigned", label: "Assigned", count: counts.assigned },
+              {
+                value: "waiting_client",
+                label: "Waiting client",
+                count: counts.waiting_client,
+              },
+              { value: "closed", label: "Closed", count: counts.closed },
+              { value: "all", label: "All", count: counts.all },
+            ]}
+          />
+        </div>
         <div className="relative">
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="Search subject, client, email, case"
-            className="input w-72 pl-9"
+            className="input w-full md:w-72 pl-9"
           />
           <svg
             viewBox="0 0 24 24"
@@ -334,76 +336,84 @@ export default function RequestsPage() {
               />
             )}
           {!requests.loading && !requests.error && visible.length > 0 && (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead className="text-xs uppercase tracking-wide text-ink-500 bg-ink-100/40">
-                  <tr>
-                    <th className="text-left font-medium px-5 py-2.5">
-                      Request
-                    </th>
-                    <th className="text-left font-medium px-5 py-2.5">
-                      Client
-                    </th>
-                    <th className="text-left font-medium px-5 py-2.5">
-                      Status
-                    </th>
-                    <th className="text-left font-medium px-5 py-2.5">Case</th>
-                    <th className="text-right font-medium px-5 py-2.5">
-                      Received
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-ink-100">
-                  {visible.map((r) => {
-                    const caseId = r.caseId || r.case_id || null;
-                    const caseObj = caseId ? caseById.get(caseId) : undefined;
-                    return (
-                      <tr
-                        key={r.id}
-                        className="hover:bg-ink-100/40 cursor-pointer"
-                        onClick={() => router.push(`/requests/${r.id}`)}
-                      >
-                        <td className="px-5 py-3">
-                          <Link
-                            href={`/requests/${r.id}`}
-                            className="font-medium text-ink-900 hover:underline"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            {requestDisplayTitle(r)}
-                          </Link>
-                        </td>
-                        <td className="px-5 py-3 text-ink-700 truncate max-w-[200px]">
-                          {r.clientName || r.client_name || r.email || "—"}
-                        </td>
-                        <td className="px-5 py-3">
-                          <span
-                            className={`badge ${statusTone(r.status)} capitalize`}
-                          >
-                            {humanStatus(r.status)}
-                          </span>
-                        </td>
-                        <td className="px-5 py-3">
-                          {caseObj ? (
-                            <Link
-                              href={`/cases/${caseObj.id}`}
-                              className="text-brand-700 hover:underline truncate max-w-[200px] inline-block"
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              {caseDisplayName(caseObj)}
-                            </Link>
-                          ) : (
-                            <span className="text-ink-500">—</span>
-                          )}
-                        </td>
-                        <td className="px-5 py-3 text-right text-ink-500 text-xs whitespace-nowrap">
-                          {relativeTime(updatedAt(r))}
-                        </td>
+            <>
+              <div className="hidden md:block">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead className="text-xs uppercase tracking-wide text-ink-500 bg-ink-100/40">
+                      <tr>
+                        <th className="text-left font-medium px-5 py-2.5">Request</th>
+                        <th className="text-left font-medium px-5 py-2.5">Client</th>
+                        <th className="text-left font-medium px-5 py-2.5">Status</th>
+                        <th className="text-left font-medium px-5 py-2.5">Case</th>
+                        <th className="text-right font-medium px-5 py-2.5">Received</th>
                       </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
+                    </thead>
+                    <tbody className="divide-y divide-ink-100">
+                      {visible.map((r) => {
+                        const caseId = r.caseId || r.case_id || null;
+                        const caseObj = caseId ? caseById.get(caseId) : undefined;
+                        return (
+                          <tr
+                            key={r.id}
+                            className="hover:bg-ink-100/40 cursor-pointer"
+                            onClick={() => router.push(`/requests/${r.id}`)}
+                          >
+                            <td className="px-5 py-3">
+                              <Link
+                                href={`/requests/${r.id}`}
+                                className="font-medium text-ink-900 hover:underline"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                {requestDisplayTitle(r)}
+                              </Link>
+                            </td>
+                            <td className="px-5 py-3 text-ink-700 truncate max-w-[200px]">
+                              {r.clientName || r.client_name || r.email || "—"}
+                            </td>
+                            <td className="px-5 py-3">
+                              <span className={`badge ${statusTone(r.status)} capitalize`}>
+                                {humanStatus(r.status)}
+                              </span>
+                            </td>
+                            <td className="px-5 py-3">
+                              {caseObj ? (
+                                <Link
+                                  href={`/cases/${caseObj.id}`}
+                                  className="text-brand-700 hover:underline truncate max-w-[200px] inline-block"
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  {caseDisplayName(caseObj)}
+                                </Link>
+                              ) : (
+                                <span className="text-ink-500">—</span>
+                              )}
+                            </td>
+                            <td className="px-5 py-3 text-right text-ink-500 text-xs whitespace-nowrap">
+                              {relativeTime(updatedAt(r))}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div className="block md:hidden divide-y divide-ink-100">
+                {visible.map((r) => (
+                  <Link key={r.id} href={`/requests/${r.id}`} className="block px-4 py-3 hover:bg-ink-100/40">
+                    <div className="flex items-center justify-between">
+                      <div className="font-medium text-ink-900 truncate">{requestDisplayTitle(r)}</div>
+                      <span className={`badge ${statusTone(r.status)} capitalize`}>{humanStatus(r.status)}</span>
+                    </div>
+                    <div className="mt-1.5 flex flex-wrap gap-x-4 gap-y-1 text-xs text-ink-500">
+                      <span>Client: {r.clientName || r.client_name || r.email || "—"}</span>
+                      <span>Received: {relativeTime(updatedAt(r))}</span>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            </>
           )}
         </SectionCard>
       </div>
