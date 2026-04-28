@@ -13,11 +13,26 @@ type NavItem = {
 const NAV: NavItem[] = [
   {
     href: "/dashboard",
-    label: "Dashboard",
+    label: "Home",
     icon: (
       <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" aria-hidden>
         <path
           d="M3 12 12 4l9 8M5 10v10h14V10"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    ),
+  },
+  {
+    href: "/leads",
+    label: "Leads",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" aria-hidden>
+        <path
+          d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"
           stroke="currentColor"
           strokeWidth="1.8"
           strokeLinecap="round"
@@ -42,6 +57,36 @@ const NAV: NavItem[] = [
     ),
   },
   {
+    href: "/requests",
+    label: "Requests",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" aria-hidden>
+        <path
+          d="M4 5h16v11H7l-3 3zM8 10h8M8 13h5"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    ),
+  },
+  {
+    href: "/drafts",
+    label: "Drafts",
+    icon: (
+      <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" aria-hidden>
+        <path
+          d="M12 20h9M16.5 3.5a2.121 2.121 0 1 1 3 3L7 19l-4 1 1-4L16.5 3.5z"
+          stroke="currentColor"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    ),
+  },
+  {
     href: "/documents",
     label: "Documents",
     icon: (
@@ -57,12 +102,12 @@ const NAV: NavItem[] = [
     ),
   },
   {
-    href: "/requests",
-    label: "Requests",
+    href: "/messages",
+    label: "Messages",
     icon: (
       <svg viewBox="0 0 24 24" fill="none" className="h-5 w-5" aria-hidden>
         <path
-          d="M4 5h16v11H7l-3 3zM8 10h8M8 13h5"
+          d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
           stroke="currentColor"
           strokeWidth="1.8"
           strokeLinecap="round"
@@ -86,7 +131,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   if (!ready) {
     return (
       <div className="min-h-screen grid place-items-center text-ink-500 text-sm">
-        Loading…
+        Loadingâ¦
       </div>
     );
   }
