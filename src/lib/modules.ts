@@ -98,12 +98,12 @@ export const notificationsApi = {
 
 export const leadsApi = {
   list: async (token: string) => {
-    const payload = await api.get<unknown>("/firms/me/requests", token);
+    const payload = await api.get<unknown>("/firms/me/leads", token);
     return asList<Lead>(payload);
   },
   get: async (token: string, id: string) => {
-    const payload = await api.get<unknown>(`/firms/me/requests/${id}`, token);
-    return asOne<Lead>(payload, "request");
+    const payload = await api.get<unknown>(`/firms/me/leads/${id}`, token);
+    return asOne<Lead>(payload, "lead", "request");
   },
 };
 

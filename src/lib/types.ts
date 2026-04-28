@@ -37,6 +37,7 @@ export type Case = {
   primary_attorney_id?: string;
   attorneyId?: string;
   attorney_id?: string;
+  primaryAttorney?: { fullName?: string; full_name?: string; email?: string } | null;
   updatedAt?: string;
   updated_at?: string;
   createdAt?: string;

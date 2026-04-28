@@ -214,7 +214,7 @@ export default function CaseDetailPage() {
               </dd>
               <dt className="col-span-1 text-ink-500">Attorney</dt>
               <dd className="col-span-2 text-ink-900 truncate">
-                {c.primaryAttorneyId || c.primary_attorney_id || c.attorneyId || c.attorney_id || "Unassigned"}
+                {c.primaryAttorney?.fullName || c.primaryAttorney?.full_name || c.primaryAttorneyId || c.primary_attorney_id || c.attorneyId || c.attorney_id || "Unassigned"}
               </dd>
               <dt className="col-span-1 text-ink-500">Opened</dt>
               <dd className="col-span-2 text-ink-700">
