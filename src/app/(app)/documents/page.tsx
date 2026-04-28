@@ -32,7 +32,7 @@ function formatBytes(bytes: string | number): string {
 export default function DocumentsPage() {
   const { session } = useAuth();
   const token = session?.token ?? null;
-  const firmId = session?.user?.firmId ?? session?.user?.firm_id ?? null;
+  const firmId = session?.user?.firmId ?? null;
 
   const [filter, setFilter] = useState<Filter>("all");
   const [q, setQ] = useState("");
