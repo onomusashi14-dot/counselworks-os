@@ -150,6 +150,35 @@ export function updatedAt(obj: {
 }
 
 
+export type Lead = {
+  id: string;
+  subject?: string;
+  title?: string;
+  clientName?: string;
+  client_name?: string;
+  email?: string;
+  phone?: string;
+  status: string;
+  source?: string;
+  caseType?: string;
+  case_type?: string;
+  caseId?: string | null;
+  case_id?: string | null;
+  assigneeId?: string | null;
+  assignee_id?: string | null;
+  note?: string;
+  message?: string;
+  body?: string;
+  createdAt?: string;
+  created_at?: string;
+  updatedAt?: string;
+  updated_at?: string;
+};
+
+export function leadDisplayTitle(l: Lead): string {
+  return l.subject || l.title || l.clientName || l.client_name || l.email || `Lead ${l.id.slice(0, 8)}`;
+}
+
 export type CWFile = {
   id: string;
   originalName: string;
