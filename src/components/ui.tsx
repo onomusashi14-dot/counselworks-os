@@ -2,14 +2,16 @@
 
 import Link from "next/link";
 
-const BLOCKED = new Set(["blocked", "awaiting_client", "on_hold"]);
+const BLOCKED = new Set(["blocked", "awaiting_client", "on_hold", "needs_revision"]);
 const WARN = new Set([
   "pending_approval",
   "in_review",
   "waiting_client",
   "triaged",
+  "in_progress",
 ]);
-const OK = new Set(["active", "approved", "sent", "closed", "resolved"]);
+const OK = new Set(["active", "approved", "sent", "resolved", "completed", "delivered"]);
+const INFO = new Set(["open", "drafted", "new"]);
 
 export function statusTone(status?: string): string {
   const s = (status || "").toLowerCase();
@@ -19,6 +21,8 @@ export function statusTone(status?: string): string {
     return "bg-amber-50 text-status-warn border border-amber-200";
   if (OK.has(s))
     return "bg-emerald-50 text-status-ok border border-emerald-200";
+  if (INFO.has(s))
+    return "bg-brand-50 text-brand-700 border border-brand-200";
   return "bg-ink-100 text-ink-700 border border-ink-100";
 }
 

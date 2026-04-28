@@ -75,13 +75,11 @@ export type ClientRequest = {
 };
 
 export type DraftStatus =
-  | "drafting"
   | "drafted"
-  | "pending_approval"
+  | "in_review"
+  | "needs_revision"
   | "approved"
-  | "rejected"
   | "delivered"
-  | "sent"
   | string;
 
 export type Draft = {
@@ -103,6 +101,7 @@ export type Draft = {
   summary?: string;
   rejectionReason?: string;
   rejection_reason?: string;
+  notes?: string;
   updatedAt?: string;
   updated_at?: string;
   createdAt?: string;

@@ -53,7 +53,7 @@ export default function LeadDetailPage() {
 
   const status = (l.status || "").toLowerCase();
   const assignee = l.assigneeId || l.assignee_id || null;
-  const isNew = ["new", "unassigned"].includes(status);
+  const isNew = status === "open";
 
   return (
     <div className="px-6 py-6 md:px-8 md:py-8">
@@ -112,23 +112,23 @@ export default function LeadDetailPage() {
               </dd>
               <dt className="col-span-1 text-ink-500">Client</dt>
               <dd className="col-span-2 text-ink-900 truncate">
-                {l.clientName || l.client_name || "â"}
+                {l.clientName || l.client_name || "—"}
               </dd>
               <dt className="col-span-1 text-ink-500">Email</dt>
               <dd className="col-span-2 text-ink-900 truncate">
-                {l.email || "â"}
+                {l.email || "—"}
               </dd>
               <dt className="col-span-1 text-ink-500">Phone</dt>
               <dd className="col-span-2 text-ink-900 truncate">
-                {l.phone || "â"}
+                {l.phone || "—"}
               </dd>
               <dt className="col-span-1 text-ink-500">Source</dt>
               <dd className="col-span-2 text-ink-700 capitalize">
-                {l.source || "â"}
+                {l.source || "—"}
               </dd>
               <dt className="col-span-1 text-ink-500">Case type</dt>
               <dd className="col-span-2 text-ink-700 capitalize">
-                {l.caseType || l.case_type || "â"}
+                {l.caseType || l.case_type || "—"}
               </dd>
               <dt className="col-span-1 text-ink-500">Assignee</dt>
               <dd className="col-span-2 text-ink-900 truncate">

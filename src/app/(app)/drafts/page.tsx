@@ -24,23 +24,14 @@ import {
 } from "@/lib/types";
 import { humanStatus, relativeTime } from "@/lib/format";
 
-type Filter = "pending_approval" | "drafting" | "approved" | "rejected" | "all";
+type Filter = "drafted" | "in_review" | "needs_revision" | "approved" | "delivered" | "all";
 
-const FILTERS: Filter[] = ["pending_approval", "drafting", "approved", "rejected", "all"];
-
-const PENDING_LIKE = new Set(["pending_approval", "in_review"]);
-const DRAFTING_LIKE = new Set(["drafting", "drafted"]);
-const APPROVED_LIKE = new Set(["approved", "sent", "delivered"]);
-const REJECTED_LIKE = new Set(["rejected"]);
+const FILTERS: Filter[] = ["drafted", "in_review", "needs_revision", "approved", "delivered", "all"];
 
 function matchesFilter(s: string | undefined, f: Filter): boolean {
   const status = (s || "").toLowerCase();
   if (f === "all") return true;
-  if (f === "pending_approval") return PENDING_LIKE.has(status);
-  if (f === "drafting") return DRAFTING_LIKE.has(status);
-  if (f === "approved") return APPROVED_LIKE.has(status);
-  if (f === "rejected") return REJECTED_LIKE.has(status);
-  return false;
+  return status === f;
 }
 
 export default function DraftsPage() {
@@ -51,7 +42,7 @@ export default function DraftsPage() {
 
   const initial = params.get("filter") as Filter | null;
   const [filter, setFilter] = useState<Filter>(
-    initial && FILTERS.includes(initial) ? initial : "pending_approval"
+    initial && FILTERS.includes(initial) ? initial : "all"
   );
   const [q, setQ] = useState("");
 
@@ -62,7 +53,7 @@ export default function DraftsPage() {
     const current = params.get("filter");
     if (filter !== current) {
       const next = new URLSearchParams(params.toString());
-      if (filter === "pending_approval") next.delete("filter");
+      if (filter === "all") next.delete("filter");
       else next.set("filter", filter);
       const qs = next.toString();
       router.replace(qs ? `/drafts?${qs}` : "/drafts", { scroll: false });
@@ -110,9 +101,9 @@ export default function DraftsPage() {
         title="Drafts"
         subtitle="Document drafting and approval queue."
         right={
-          counts.pending_approval > 0 ? (
+          counts.in_review > 0 ? (
             <span className="badge bg-amber-100 text-amber-700">
-              {counts.pending_approval} awaiting approval
+              {counts.in_review} in review
             </span>
           ) : undefined
         }
@@ -123,10 +114,11 @@ export default function DraftsPage() {
           value={filter}
           onChange={setFilter}
           options={[
-            { value: "pending_approval", label: "Pending", count: counts.pending_approval },
-            { value: "drafting", label: "Drafting", count: counts.drafting },
+            { value: "drafted", label: "Drafted", count: counts.drafted },
+            { value: "in_review", label: "In Review", count: counts.in_review },
+            { value: "needs_revision", label: "Revision", count: counts.needs_revision },
             { value: "approved", label: "Approved", count: counts.approved },
-            { value: "rejected", label: "Rejected", count: counts.rejected },
+            { value: "delivered", label: "Delivered", count: counts.delivered },
             { value: "all", label: "All", count: counts.all },
           ]}
         />
@@ -196,7 +188,7 @@ export default function DraftsPage() {
                           </Link>
                         </td>
                         <td className="px-5 py-3 text-ink-500 text-xs capitalize">
-                          {dType ? humanStatus(dType) : "â"}
+                          {dType ? humanStatus(dType) : "—"}
                         </td>
                         <td className="px-5 py-3">
                           <span className={`badge ${statusTone(d.status)} capitalize`}>
@@ -213,11 +205,11 @@ export default function DraftsPage() {
                               {caseDisplayName(caseObj)}
                             </Link>
                           ) : (
-                            <span className="text-ink-500">â</span>
+                            <span className="text-ink-500">—</span>
                           )}
                         </td>
                         <td className="px-5 py-3 text-ink-700 truncate max-w-[150px]">
-                          {d.authorName || d.author_name || "â"}
+                          {d.authorName || d.author_name || "—"}
                         </td>
                         <td className="px-5 py-3 text-right text-ink-500 text-xs whitespace-nowrap">
                           {relativeTime(updatedAt(d))}

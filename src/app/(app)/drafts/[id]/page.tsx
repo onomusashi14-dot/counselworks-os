@@ -101,8 +101,8 @@ export default function DraftDetailPage() {
   }
 
   const status = (d.status || "").toLowerCase();
-  const isPending = ["pending_approval", "in_review"].includes(status);
-  const isRejected = status === "rejected";
+  const isPending = status === "in_review";
+  const isRevision = status === "needs_revision";
   const caseId = d.caseId || d.case_id || null;
   const caseObj: Case | undefined = caseId
     ? (casesQ.data ?? []).find((c) => c.id === caseId)
@@ -158,13 +158,13 @@ export default function DraftDetailPage() {
         </div>
       )}
 
-      {isRejected && d.rejectionReason || d.rejection_reason ? (
+      {isRevision && (d.rejectionReason || d.rejection_reason || d.notes) ? (
         <div
           role="alert"
-          className="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-status-risk"
+          className="mt-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800"
         >
-          <span className="font-semibold">Rejection reason:</span>{" "}
-          {d.rejectionReason || d.rejection_reason}
+          <span className="font-semibold">Revision requested:</span>{" "}
+          {d.rejectionReason || d.rejection_reason || d.notes}
         </div>
       ) : null}
 
@@ -209,11 +209,11 @@ export default function DraftDetailPage() {
               </dd>
               <dt className="col-span-1 text-ink-500">Type</dt>
               <dd className="col-span-2 text-ink-900 capitalize">
-                {dType ? humanStatus(dType) : "â"}
+                {dType ? humanStatus(dType) : "—"}
               </dd>
               <dt className="col-span-1 text-ink-500">Author</dt>
               <dd className="col-span-2 text-ink-900 truncate">
-                {d.authorName || d.author_name || d.authorId || d.author_id || "â"}
+                {d.authorName || d.author_name || d.authorId || d.author_id || "—"}
               </dd>
               <dt className="col-span-1 text-ink-500">Case</dt>
               <dd className="col-span-2">
@@ -225,7 +225,7 @@ export default function DraftDetailPage() {
                     {caseDisplayName(caseObj)}
                   </Link>
                 ) : (
-                  <span className="text-ink-500">â</span>
+                  <span className="text-ink-500">—</span>
                 )}
               </dd>
               <dt className="col-span-1 text-ink-500">Created</dt>

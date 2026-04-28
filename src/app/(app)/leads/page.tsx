@@ -18,23 +18,12 @@ import { leadsApi } from "@/lib/modules";
 import { leadDisplayTitle, updatedAt, type Lead } from "@/lib/types";
 import { humanStatus, relativeTime } from "@/lib/format";
 
-type Filter = "new" | "contacted" | "qualified" | "converted" | "lost" | "all";
-
-const NEW_LIKE = new Set(["new", "unassigned"]);
-const CONTACTED_LIKE = new Set(["triaged", "contacted", "in_progress"]);
-const QUALIFIED_LIKE = new Set(["assigned", "qualified"]);
-const CONVERTED_LIKE = new Set(["completed", "converted", "closed"]);
-const LOST_LIKE = new Set(["lost", "rejected", "not_a_fit"]);
+type Filter = "open" | "in_progress" | "completed" | "closed" | "all";
 
 function matchesFilter(s: string | undefined, f: Filter): boolean {
   const status = (s || "").toLowerCase();
   if (f === "all") return true;
-  if (f === "new") return NEW_LIKE.has(status);
-  if (f === "contacted") return CONTACTED_LIKE.has(status);
-  if (f === "qualified") return QUALIFIED_LIKE.has(status);
-  if (f === "converted") return CONVERTED_LIKE.has(status);
-  if (f === "lost") return LOST_LIKE.has(status);
-  return false;
+  return status === f;
 }
 
 export default function LeadsPage() {
@@ -44,9 +33,9 @@ export default function LeadsPage() {
   const token = session?.token ?? null;
 
   const initial = params.get("filter") as Filter | null;
-  const FILTERS: Filter[] = ["new", "contacted", "qualified", "converted", "lost", "all"];
+  const FILTERS: Filter[] = ["open", "in_progress", "completed", "closed", "all"];
   const [filter, setFilter] = useState<Filter>(
-    initial && FILTERS.includes(initial) ? initial : "new"
+    initial && FILTERS.includes(initial) ? initial : "open"
   );
   const [q, setQ] = useState("");
 
@@ -56,7 +45,7 @@ export default function LeadsPage() {
     const current = params.get("filter");
     if (filter !== current) {
       const next = new URLSearchParams(params.toString());
-      if (filter === "new") next.delete("filter");
+      if (filter === "open") next.delete("filter");
       else next.set("filter", filter);
       const qs = next.toString();
       router.replace(qs ? `/leads?${qs}` : "/leads", { scroll: false });
@@ -93,11 +82,11 @@ export default function LeadsPage() {
     <div className="px-6 py-6 md:px-8 md:py-8">
       <PageHeader
         title="Leads"
-        subtitle="Intake pipeline â every potential client, from first contact to conversion."
+        subtitle="Intake pipeline — every potential client, from first contact to conversion."
         right={
-          counts.new > 0 ? (
+          counts.open > 0 ? (
             <span className="badge bg-brand-100 text-brand-700">
-              {counts.new} new
+              {counts.open} open
             </span>
           ) : undefined
         }
@@ -108,11 +97,10 @@ export default function LeadsPage() {
           value={filter}
           onChange={setFilter}
           options={[
-            { value: "new", label: "New", count: counts.new },
-            { value: "contacted", label: "Contacted", count: counts.contacted },
-            { value: "qualified", label: "Qualified", count: counts.qualified },
-            { value: "converted", label: "Converted", count: counts.converted },
-            { value: "lost", label: "Lost", count: counts.lost },
+            { value: "open", label: "Open", count: counts.open },
+            { value: "in_progress", label: "In Progress", count: counts.in_progress },
+            { value: "completed", label: "Completed", count: counts.completed },
+            { value: "closed", label: "Closed", count: counts.closed },
             { value: "all", label: "All", count: counts.all },
           ]}
         />
@@ -178,10 +166,10 @@ export default function LeadsPage() {
                         </Link>
                       </td>
                       <td className="px-5 py-3 text-ink-700 truncate max-w-[180px]">
-                        {l.clientName || l.client_name || "â"}
+                        {l.clientName || l.client_name || "—"}
                       </td>
                       <td className="px-5 py-3 text-ink-700 truncate max-w-[200px]">
-                        {l.email || "â"}
+                        {l.email || "—"}
                       </td>
                       <td className="px-5 py-3">
                         <span className={`badge ${statusTone(l.status)} capitalize`}>
@@ -189,7 +177,7 @@ export default function LeadsPage() {
                         </span>
                       </td>
                       <td className="px-5 py-3 text-ink-500 text-xs">
-                        {l.source || "â"}
+                        {l.source || "—"}
                       </td>
                       <td className="px-5 py-3 text-right text-ink-500 text-xs whitespace-nowrap">
                         {relativeTime(l.createdAt || l.created_at)}
