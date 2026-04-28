@@ -5,6 +5,7 @@ import type {
   CWFile,
   Draft,
   Firm,
+  Lead,
   Notification,
 } from "./types";
 
@@ -12,7 +13,7 @@ function asList<T>(payload: unknown): T[] {
   if (Array.isArray(payload)) return payload as T[];
   if (payload && typeof payload === "object") {
     const p = payload as Record<string, unknown>;
-    for (const key of ["items", "data", "results", "records", "cases", "requests", "drafts", "notifications", "files"]) {
+    for (const key of ["items", "data", "results", "records", "cases", "requests", "leads", "drafts", "notifications", "files"]) {
       if (Array.isArray(p[key])) return p[key] as T[];
     }
   }
@@ -92,6 +93,17 @@ export const notificationsApi = {
   list: async (token: string) => {
     const payload = await api.get<unknown>("/notifications", token);
     return asList<Notification>(payload);
+  },
+};
+
+export const leadsApi = {
+  list: async (token: string) => {
+    const payload = await api.get<unknown>("/firms/me/requests", token);
+    return asList<Lead>(payload);
+  },
+  get: async (token: string, id: string) => {
+    const payload = await api.get<unknown>(`/firms/me/requests/${id}`, token);
+    return asOne<Lead>(payload, "request");
   },
 };
 
