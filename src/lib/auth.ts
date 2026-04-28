@@ -10,7 +10,7 @@ type LoginResponse = {
 
 function normalizeRole(raw: unknown): UserRole {
   const r = String(raw || "").toLowerCase();
-  if (r === "attorney" || r === "lawyer" || r === "admin") return "attorney";
+  if (r === "attorney" || r === "managing_attorney" || r === "lawyer" || r === "admin") return "attorney";
   return "staff";
 }
 
